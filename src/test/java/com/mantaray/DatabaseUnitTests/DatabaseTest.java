@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.mantaray.mySQLDatabaseConnection;
+import com.mantaray.database.mySQLDatabaseConnection;
 
 public class DatabaseTest 
 {

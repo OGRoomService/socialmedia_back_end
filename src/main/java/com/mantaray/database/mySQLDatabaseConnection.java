@@ -1,4 +1,4 @@
-package com.mantaray;
+package com.mantaray.database;
 
 import java.sql.Connection;
 import javax.management.Query;
