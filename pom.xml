@@ -116,6 +116,8 @@
         </configuration>
         <executions>
           <execution>
+            <!-- I had to add this thing below to remove error?-->
+            <?m2e execute onConfiguration?>
             <id>checkstyle</id>
             <phase>validate</phase>
             <goals>
