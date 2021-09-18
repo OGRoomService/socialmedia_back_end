@@ -87,7 +87,7 @@ public class UserModel
     @Override
     public int hashCode() 
     {
-        return Objects.hash(id, username, password, loggedIn);
+        return Objects.hash(id, username, password, loggedIn, profilePicture);
     }    
     
     @Override
