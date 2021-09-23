@@ -103,6 +103,11 @@
             <artifactId>checkstyle</artifactId>
             <version>${checkstyle.version}</version>
           </dependency>
+          <dependency>
+            <groupId>com.github.ngeor</groupId>
+            <artifactId>checkstyle-rules</artifactId>
+            <version>${checkstyle-rules.version}</version>
+          </dependency>
         </dependencies>
         <configuration>
           <configLocation>google_checks.xml</configLocation>
