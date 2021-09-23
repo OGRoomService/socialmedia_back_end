@@ -1,8 +1,9 @@
-package com.mantaray.PasswordVerificationUnitTests;
+package com.mantaray.UserVerificationTests;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import com.mantaray.PasswordVerification;
+
+import com.mantaray.UserVerification.PasswordVerification;
 
 public class PasswordVerificationTest
 {

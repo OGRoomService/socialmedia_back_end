@@ -1,4 +1,4 @@
-package com.mantaray;
+package com.mantaray.UserVerification;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
