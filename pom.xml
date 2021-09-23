@@ -83,6 +83,7 @@
               <goal>enforce</goal>
             </goals>
             <configuration>
+              <configLocation>google_checks.xml</configLocation>
               <rules>
                 <requireMavenVersion>
                   <version>3.6.3</version>
