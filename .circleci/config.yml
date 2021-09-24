@@ -22,8 +22,13 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      # Save artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
+          destination: build
+      # Upload test results
       - store_test_results:
-        path: /test-results/
+          path: /tmp/test-reports
 
 workflows:
   # Below is the definition of your workflow.
