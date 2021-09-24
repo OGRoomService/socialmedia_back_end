@@ -5,6 +5,13 @@ import java.util.regex.Pattern;
 
 public class PasswordVerification
 {
+    /**
+     * This verifies that a password is longer than
+     * 8 characters long and contains at least a 
+     * symbol and at least a digit.
+     * @param password
+     * @return
+     */
     public boolean checkPassword(String password)
     {
         if(password.length() >= 8)

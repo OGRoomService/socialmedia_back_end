@@ -5,6 +5,13 @@ import java.util.regex.Pattern;
 
 public class EmailVerification
 {
+    /**
+     * This determines whether or not an email follows
+     * the regex set in place. This does not actually
+     * tell you whether or not the email exists.
+     * @param email
+     * @return
+     */
     public boolean checkEmail(String email)
     {
         Matcher emailMatcher = emailRegex.matcher(email);
