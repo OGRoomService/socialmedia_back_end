@@ -18,6 +18,9 @@ jobs:
       - run:
           name: Build
           command: mvn -B -DskipTests clean package
+      - run:
+          name: Create unit test documentation
+          command: store_test_results
       # Then run your tests!
       - run:
           name: Test
