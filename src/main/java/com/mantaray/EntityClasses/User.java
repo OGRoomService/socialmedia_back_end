@@ -27,7 +27,7 @@ public class User
 
     private String profilePicture;
 
-    
+
     /**
      * Getters
      */
@@ -92,6 +92,11 @@ public class User
     public void removeFromFriendsList(User user)
     {
         this.friendsList.remove(user);
+    }
+
+    public boolean isInFriendsList(User user)
+    {
+        return this.friendsList.contains(user);
     }
 
 }
