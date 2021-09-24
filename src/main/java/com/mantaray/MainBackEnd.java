@@ -5,7 +5,7 @@ package com.mantaray;
  */
 public final class MainBackEnd
 {
-    
+
     /**
      * Generic Javadoc comment
      */

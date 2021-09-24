@@ -1,8 +1,9 @@
-package com.mantaray.database;
+package com.mantaray.Database;
 
 import java.sql.Connection;
 import javax.management.Query;
-import com.mantaray.interfaces.DatabaseIntf;
+
+import com.mantaray.Interfaces.DatabaseIntf;
 
 public class mySQLDatabaseConnection implements DatabaseIntf
 {

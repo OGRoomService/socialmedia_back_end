@@ -1,4 +1,4 @@
-package com.mantaray.interfaces;
+package com.mantaray.Interfaces;
 
 public interface DatabaseIntf
 {
