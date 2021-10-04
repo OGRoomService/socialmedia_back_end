@@ -17,7 +17,7 @@ public class ToDoService {
         return toDoRepository.findAll();
     }
 
-    public ToDo findById(String id) {
+    public ToDo findById(Long id) {
         return toDoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
@@ -25,7 +25,7 @@ public class ToDoService {
         return toDoRepository.save(toDo);
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         toDoRepository.deleteById(id);
     }
 }

@@ -1,6 +1,6 @@
 package com.mantarays.socialbackend.data;
 
-import java.util.List;
+//import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,7 +18,7 @@ public class User
 
     private String password;
 
-    private List<User> friendsList;
+/*     private List<User> friendsList; */
 
     private String email;
 
@@ -38,10 +38,10 @@ public class User
         return this.email;
     }
 
-    public List<User> getFriendsList()
+/*     public List<User> getFriendsList()
     {
         return this.friendsList;
-    }
+    } */
 
     public String getPassword()
     {
@@ -81,7 +81,7 @@ public class User
     /**
      * Friends list functions
      */
-    public void addToFriendsList(User user)
+/*     public void addToFriendsList(User user)
     {
         this.friendsList.add(user);
     }
@@ -94,6 +94,6 @@ public class User
     public boolean isInFriendsList(User user)
     {
         return this.friendsList.contains(user);
-    }
+    } */
 
 }

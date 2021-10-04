@@ -9,16 +9,21 @@ import javax.persistence.GenerationType;
 public class ToDo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private Long id;
     private String title;
     private boolean completed;
+
+    public ToDo() {
+        this.title = "";
+        this.completed = false;
+    }
 
     public ToDo(String title, boolean completed) {
         this.title = title;
         this.completed = completed;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
     
