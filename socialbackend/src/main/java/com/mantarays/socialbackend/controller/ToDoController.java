@@ -24,7 +24,7 @@ public class ToDoController {
     }
 
     @GetMapping("/{id}")
-    public ToDo findById(@PathVariable String id) {
+    public ToDo findById(@PathVariable Long id) {
         return toDoService.findById(id);
     }
 
@@ -38,7 +38,7 @@ public class ToDoController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable String id) {
+    public void deleteById(@PathVariable Long id) {
         toDoService.deleteById(id);
     }
 }
