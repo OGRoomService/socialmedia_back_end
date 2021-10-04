@@ -8,3 +8,6 @@ This backend is utilizing Java, Maven, and JUnit
 To start MySQL run: docker-compose -f .\docker-compose-dev.yml up
 
 Note: Make sure docker is running and you are logged into docker hub
+
+## Dependencies for VSCode
+https://code.visualstudio.com/docs/java/java-spring-boot
