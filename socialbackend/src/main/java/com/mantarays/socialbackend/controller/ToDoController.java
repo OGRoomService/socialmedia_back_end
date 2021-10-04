@@ -1,5 +1,7 @@
 package com.mantarays.socialbackend.controller;
 
+import java.util.List;
+
 import com.mantarays.socialbackend.data.ToDo;
 import com.mantarays.socialbackend.service.ToDoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/api/todo")
@@ -30,6 +33,12 @@ public class ToDoController {
 
     @PostMapping ToDo create(@RequestBody ToDo toDo) {
         return toDoService.save(toDo);
+    }
+
+    @RequestMapping("/many")
+    public List<ToDo> create(@RequestBody List<ToDo> listToDo) {
+        listToDo.forEach(x -> toDoService.save(x));
+        return listToDo;
     }
 
     @PutMapping("/{id}")
