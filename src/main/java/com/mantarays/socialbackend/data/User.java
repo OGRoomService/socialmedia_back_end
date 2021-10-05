@@ -1,11 +1,15 @@
 package com.mantarays.socialbackend.data;
 
-//import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+
+import com.mantarays.socialbackend.service.UsernameVerification;
 
 @Entity
 public class User 
@@ -18,11 +22,26 @@ public class User
 
     private String password;
 
-/*     private List<User> friendsList; */
+    @ManyToMany
+    private List<User> friendsList;
 
     private String email;
 
     private String profilePicture;
+
+    public User() {
+        this.username = "";
+        this.password = "";
+        this.friendsList = new ArrayList<User>();
+        this.email = "";
+        this.profilePicture = "";
+    }
+
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
 
     /**
@@ -38,10 +57,10 @@ public class User
         return this.email;
     }
 
-/*     public List<User> getFriendsList()
+    public List<User> getFriendsList()
     {
         return this.friendsList;
-    } */
+    }
 
     public String getPassword()
     {
@@ -81,7 +100,7 @@ public class User
     /**
      * Friends list functions
      */
-/*     public void addToFriendsList(User user)
+    public void addToFriendsList(User user)
     {
         this.friendsList.add(user);
     }
@@ -94,6 +113,6 @@ public class User
     public boolean isInFriendsList(User user)
     {
         return this.friendsList.contains(user);
-    } */
+    }
 
 }
