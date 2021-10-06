@@ -32,12 +32,13 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @PostMapping User create(@RequestBody User user) {
-        return userService.save(user);
+    @PostMapping("/create_account")
+    public User create(@RequestBody User user) {
+        return userService.create(user);
     }
 
     @RequestMapping("/friend")
-    public User addFriend(@RequestParam Long uid1, @RequestParam Long uid2) {
+    public void addFriend(@RequestParam Long uid1, @RequestParam Long uid2) {
         userService.addFriendToUser(uid1, uid2);
     }
 
@@ -48,8 +49,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public User update(@RequestBody User toDo) {
-        return userService.save(toDo);
+    public User update(@RequestBody User user) {
+        return userService.save(user);
     }
 
     @DeleteMapping("/{id}")
