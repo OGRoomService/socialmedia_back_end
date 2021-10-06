@@ -24,7 +24,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void addFriendToUser(Long uid1, User uid2) {
+    public void addFriendToUser(Long uid1, Long uid2) {
         User user1 = findById(uid1);
         User user2 = findById(uid2);
         

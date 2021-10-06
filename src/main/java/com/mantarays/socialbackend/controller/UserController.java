@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @RequestMapping("/friend")
-    public User addFriend(@RequestParam Long uid1, @RequestParam Long uid2) {
+    public void addFriend(@RequestParam Long uid1, @RequestParam Long uid2) {
         userService.addFriendToUser(uid1, uid2);
     }
 
