@@ -4,6 +4,7 @@ import com.mantarays.socialbackend.data.User;
 import com.mantarays.socialbackend.exception.EntityNotFoundException;
 import com.mantarays.socialbackend.repository.UserRepository;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void addFriendToUser(Long uid1, User uid2) {
+    public User create(User user) {
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12));
+        user.setPassword(hashedPassword);
+        System.out.println(hashedPassword);
+       
+        return userRepository.save(user);
+    }
+
+    public void addFriendToUser(Long uid1, Long uid2) {
         User user1 = findById(uid1);
         User user2 = findById(uid2);
         
