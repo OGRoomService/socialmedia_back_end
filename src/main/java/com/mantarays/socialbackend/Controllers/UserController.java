@@ -38,35 +38,39 @@ public class UserController
     @PostMapping("/users/create")
     public ResponseEntity<?> saveUser(@RequestParam Map<String, String> myMap)
     {
-        UserFailureStrings upForm = new UserFailureStrings();
-        boolean usernamePassed = usernameVerification.checkUsername(myMap.get("username"));
-        boolean passwordPassed = passwordVerification.checkPassword(myMap.get("password"));
-        boolean emailPassed = emailVerification.checkEmail(myMap.get("email"));
+        boolean conditionalPassed;
+        UserFailureStrings upForm;
         ResponseEntity<?> errorResponse;
+        URI uri;
 
+        upForm = new UserFailureStrings();
+        conditionalPassed = true;
 
-        if(!usernamePassed)
+        if(!usernameVerification.checkUsername(myMap.get("username")))
         {
             upForm.usernameFailureString = "Username failed preconditions";
+            conditionalPassed = false;
         }
-        if(!passwordPassed)
+        if(!passwordVerification.checkPassword(myMap.get("password")))
         {
             upForm.passwordFailureString = "Password failed preconditions";
+            conditionalPassed = false;
         }
-        if(!emailPassed)
+        if(!emailVerification.checkEmail(myMap.get("email")))
         {
             upForm.emailFailureString = "Email failed preconditions";
+            conditionalPassed = false;
         }
 
-        if(!passwordPassed || !usernamePassed || !emailPassed)
+        if(!conditionalPassed)
         {
             errorResponse = ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(upForm);
             return errorResponse;
         }
 
         
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(new User(0, myMap.get("username"), myMap.get("password"), myMap.get("email"), false, new ArrayList<Role>() )));
+        uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
+        return ResponseEntity.created(uri).body(userService.createUser(new User(0, myMap.get("username"), myMap.get("password"), myMap.get("email"), false, new ArrayList<Role>() )));
     }
 
     @PostMapping("/users/save")

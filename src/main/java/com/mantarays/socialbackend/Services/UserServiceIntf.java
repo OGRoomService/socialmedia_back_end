@@ -7,6 +7,7 @@ import com.mantarays.socialbackend.Models.User;
 
 public interface UserServiceIntf 
 {
+    User createUser(User user);
     User saveUser(User user);
     Role saveRole(Role role);
     void addRoleToUser(String username, String roleName);
