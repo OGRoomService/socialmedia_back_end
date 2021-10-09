@@ -95,6 +95,22 @@ public class UserService implements UserServiceIntf, UserDetailsService
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
+    public User loadUserByEmail(String email) throws UsernameNotFoundException 
+    {
+        User user = userRepo.findByEmail(email);
+        if(user == null)
+        {
+            String error = "User not found in database.";
+            log.error(error);
+            throw new UsernameNotFoundException(error);
+        }
+        else
+        {
+            log.info("User with email {} found in database", email);
+        }
+        return user;
+    }
+
     public void deleteAll()
     {
         userRepo.deleteAll();

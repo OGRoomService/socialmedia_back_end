@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mantarays.socialbackend.Services.UserService;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,10 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter 
 {
     private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager)
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService)
     {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
     }
 
     @Override
@@ -40,13 +43,23 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String email = request.getParameter("email");
+        
 
-        log.info("Trying to login with username: {} , password: {}", username, password);
+        if(email != null)
+        {
+            com.mantarays.socialbackend.Models.User user = userService.loadUserByEmail(email);
+            username = user.getUsername();
+        }
+
+        log.info("Trying to login with username: {} , password: {}, email: {}", username, password, email);
+
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
 
         return authenticationManager.authenticate(authenticationToken);
     }
+    
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException 
