@@ -7,4 +7,5 @@ public class RoleToUserForm
 {
     private String username;
     private String rolename;
+    private String email;
 }
