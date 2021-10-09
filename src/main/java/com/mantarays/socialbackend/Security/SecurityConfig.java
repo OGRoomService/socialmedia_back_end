@@ -1,6 +1,9 @@
 package com.mantarays.socialbackend.Security;
 
 import com.mantarays.socialbackend.Filter.CustomAuthenticationFilter;
+import com.mantarays.socialbackend.Repositories.RoleRepository;
+import com.mantarays.socialbackend.Repositories.UserRepository;
+import com.mantarays.socialbackend.Services.UserService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +25,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepo;
+    private final RoleRepository roleRepo;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception
@@ -39,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
         //http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/user/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().anyRequest().permitAll(); //TODO make this only allow ROLE_USER?
         //http.authorizeRequests().anyRequest().authenticated();
-        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean(), new UserService(userRepo, roleRepo, passwordEncoder)));
     }
 
     @Bean
