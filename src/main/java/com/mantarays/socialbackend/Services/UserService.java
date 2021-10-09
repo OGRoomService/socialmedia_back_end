@@ -32,11 +32,17 @@ public class UserService implements UserServiceIntf, UserDetailsService
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User saveUser(User user)
+    public User createUser(User user)
     {
         log.debug("Saving new user \"{}\" to database.", user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        //TODO verify user stuff like username and pass
+        return userRepo.save(user);
+    }
+
+    @Override
+    public User saveUser(User user)
+    {
+        log.debug("Saving new user \"{}\" to database.", user.getUsername());
         return userRepo.save(user);
     }
 
