@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Data;
-
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
