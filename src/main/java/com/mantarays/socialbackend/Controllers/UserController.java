@@ -12,6 +12,7 @@ import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Services.PasswordVerification;
 import com.mantarays.socialbackend.Services.UsernameVerification;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -34,17 +35,15 @@ public class UserController
     }
 
     @PostMapping("/users/create")
-    public ResponseEntity<User> saveUser(@RequestParam Map<String, String> myMap)
+    public ResponseEntity<?> saveUser(@RequestParam Map<String, String> myMap)
     {
         if(!usernameVerification.checkUsername(myMap.get("username")))
         {
-            //Username failed
-            return null;
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Username failed preconditions");
         }
         if(!passwordVerification.checkPassword(myMap.get("password")))
         {
-            //Password failed
-            return null;
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Password failed preconditions");
         }
 
         
@@ -73,10 +72,10 @@ public class UserController
         return ResponseEntity.ok().build();
     }
 
-    //TODO eventually remove this
     @GetMapping("/users/deleteAll")
-    public void deleteAll()
+    public ResponseEntity<?> deleteAll()
     {
         userService.deleteAll();
+        return ResponseEntity.ok().body("Deleted all user accounts...");
     }
 }
