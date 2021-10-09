@@ -3,7 +3,7 @@ package com.mantarays.socialbackend.UserVerificationTests;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.mantarays.socialbackend.service.UsernameVerification;
+import com.mantarays.socialbackend.Services.UsernameVerification;
 
 public class UsernameVerificationTest
 {
