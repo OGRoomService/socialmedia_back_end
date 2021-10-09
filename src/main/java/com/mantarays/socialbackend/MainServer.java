@@ -1,5 +1,6 @@
 package com.mantarays.socialbackend;
 
+import com.mantarays.socialbackend.Services.EmailVerification;
 import com.mantarays.socialbackend.Services.PasswordVerification;
 import com.mantarays.socialbackend.Services.UsernameVerification;
 
@@ -33,6 +34,12 @@ public class MainServer
 	PasswordVerification passwordVerification()
 	{
 		return new PasswordVerification();
+	}
+
+	@Bean
+	EmailVerification emailVerification()
+	{
+		return new EmailVerification();
 	}
 
 }

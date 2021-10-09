@@ -9,6 +9,7 @@ import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.RoleToUserForm;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Services.UserService;
+import com.mantarays.socialbackend.Services.EmailVerification;
 import com.mantarays.socialbackend.Services.PasswordVerification;
 import com.mantarays.socialbackend.Services.UsernameVerification;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Data;
 
 @RestController
 @RequestMapping("/api")
@@ -27,6 +29,7 @@ public class UserController
     private final UserService userService; 
     private final UsernameVerification usernameVerification;
     private final PasswordVerification passwordVerification;
+    private final EmailVerification emailVerification;
   
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers()
@@ -37,18 +40,35 @@ public class UserController
     @PostMapping("/users/create")
     public ResponseEntity<?> saveUser(@RequestParam Map<String, String> myMap)
     {
-        if(!usernameVerification.checkUsername(myMap.get("username")))
+        UserFailureStrings upForm = new UserFailureStrings();
+        boolean usernamePassed = usernameVerification.checkUsername(myMap.get("username"));
+        boolean passwordPassed = passwordVerification.checkPassword(myMap.get("password"));
+        boolean emailPassed = emailVerification.checkEmail(myMap.get("email"));
+        ResponseEntity<?> errorResponse;
+
+
+        if(!usernamePassed)
         {
-            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Username failed preconditions");
+            upForm.usernameFailureString = "Username failed preconditions";
         }
-        if(!passwordVerification.checkPassword(myMap.get("password")))
+        if(!passwordPassed)
         {
-            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Password failed preconditions");
+            upForm.passwordFailureString = "Password failed preconditions";
+        }
+        if(!emailPassed)
+        {
+            upForm.emailFailureString = "Email failed preconditions";
+        }
+
+        if(!passwordPassed || !usernamePassed || !emailPassed)
+        {
+            errorResponse = ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(upForm);
+            return errorResponse;
         }
 
         
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(new User(0, myMap.get("username"), myMap.get("password"), false, new ArrayList<Role>() )));
+        return ResponseEntity.created(uri).body(userService.saveUser(new User(0, myMap.get("username"), myMap.get("password"), myMap.get("email"), false, new ArrayList<Role>() )));
     }
 
     @PostMapping("/users/save")
@@ -77,5 +97,12 @@ public class UserController
     {
         userService.deleteAll();
         return ResponseEntity.ok().body("Deleted all user accounts...");
+    }
+
+    public class UserFailureStrings
+    {
+        String usernameFailureString;
+        String passwordFailureString;
+        String emailFailureString;
     }
 }
