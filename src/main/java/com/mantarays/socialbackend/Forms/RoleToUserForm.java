@@ -1,4 +1,4 @@
-package com.mantarays.socialbackend.Models;
+package com.mantarays.socialbackend.Forms;
 
 import lombok.Data;
 

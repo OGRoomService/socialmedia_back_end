@@ -32,5 +32,8 @@ public class User
     private boolean loggedIn;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles = new ArrayList<Role>();   
+    private List<Role> roles = new ArrayList<Role>();
+
+    @ManyToMany
+    private List<User> friends = new ArrayList<User>();
 }
