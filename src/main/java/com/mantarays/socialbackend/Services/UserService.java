@@ -155,5 +155,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
     {
         List<User> friendsList = user.getFriends();
         friendsList.remove(oldFriend);
+        user.setFriends(friendsList);
     }
 }
