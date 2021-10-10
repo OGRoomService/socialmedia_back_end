@@ -10,6 +10,7 @@ import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Repositories.UserRepository;
+import com.mantarays.socialbackend.ServiceInterfaces.UserServiceIntf;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -145,16 +146,12 @@ public class UserService implements UserServiceIntf, UserDetailsService
     @Override
     public void addUserToFriendsList(User user, User newFriend) 
     {
-        List<User> friendsList = user.getFriends();
-        friendsList.add(newFriend);
-        user.setFriends(friendsList);
+        user.getFriends().add(newFriend);
     }
 
     @Override
     public void removeUserFromFriendsList(User user, User oldFriend) 
     {
-        List<User> friendsList = user.getFriends();
-        friendsList.remove(oldFriend);
-        user.setFriends(friendsList);
+        user.getFriends().remove(oldFriend);
     }
 }

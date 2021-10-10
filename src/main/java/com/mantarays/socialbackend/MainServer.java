@@ -1,8 +1,8 @@
 package com.mantarays.socialbackend;
 
-import com.mantarays.socialbackend.Services.EmailVerification;
-import com.mantarays.socialbackend.Services.PasswordVerification;
-import com.mantarays.socialbackend.Services.UsernameVerification;
+import com.mantarays.socialbackend.VerificationServices.EmailVerification;
+import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
+import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

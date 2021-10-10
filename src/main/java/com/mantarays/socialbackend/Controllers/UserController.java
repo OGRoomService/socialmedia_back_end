@@ -11,9 +11,9 @@ import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Services.UserService;
-import com.mantarays.socialbackend.Services.EmailVerification;
-import com.mantarays.socialbackend.Services.PasswordVerification;
-import com.mantarays.socialbackend.Services.UsernameVerification;
+import com.mantarays.socialbackend.VerificationServices.EmailVerification;
+import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
+import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

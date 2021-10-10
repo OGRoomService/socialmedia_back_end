@@ -1,9 +1,9 @@
-package com.mantarays.socialbackend.UserVerificationTests;
+package com.mantarays.socialbackend.VerificationTests;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.mantarays.socialbackend.Services.UsernameVerification;
+import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
 
 public class UsernameVerificationTest
 {
@@ -12,30 +12,30 @@ public class UsernameVerificationTest
     @Test
     void givenAUsernameLessThan6Characters_WhenCheckUsernameCalled_ThenReturnFalse() 
     {
-        assertEquals(myUsernameVerifier.checkUsername("short"), false);
+        assertEquals(false, myUsernameVerifier.checkUsername("short"));
     }
 
     @Test
     void givenAUsernameEqualTo6Characters_WhenCheckUsernameCalled_ThenReturnFalse() 
     {
-        assertEquals(myUsernameVerifier.checkUsername("short"), false);
+        assertEquals(false, myUsernameVerifier.checkUsername("short"));
     }
 
     @Test
     void givenAUsernameEqualTo6CharactersWithASymbol_WhenCheckUsernameCalled_ThenReturnFalse() 
     {
-        assertEquals(myUsernameVerifier.checkUsername("short!@#"), false);
+        assertEquals(false, myUsernameVerifier.checkUsername("short!@#"));
     }
 
     @Test
     void givenAUsernameGreater6CharactersWithASymbol_WhenCheckUsernameCalled_ThenReturnFalse() 
     {
-        assertEquals(myUsernameVerifier.checkUsername("Username111!"), false);
+        assertEquals(false, myUsernameVerifier.checkUsername("Username111!"));
     }
 
     @Test
     void givenAUsernameEqualTo6CharactersWithADigit_WhenCheckUsernameCalled_ThenReturnTrue() 
     {
-        assertEquals(myUsernameVerifier.checkUsername("Username1"), true);
+        assertEquals(true, myUsernameVerifier.checkUsername("Username1"));
     }
 }

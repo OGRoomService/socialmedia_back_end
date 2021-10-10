@@ -1,4 +1,4 @@
-package com.mantarays.socialbackend.Services;
+package com.mantarays.socialbackend.ServiceInterfaces;
 
 import java.util.List;
 

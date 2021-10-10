@@ -1,9 +1,9 @@
-package com.mantarays.socialbackend.UserVerificationTests;
+package com.mantarays.socialbackend.VerificationTests;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.mantarays.socialbackend.Services.PasswordVerification;
+import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
 
 public class PasswordVerificationTest
 {
@@ -12,30 +12,30 @@ public class PasswordVerificationTest
     @Test
     void givenAPasswordOfLengthLessThanEight_WhenCheckPasswordCalled_ThenReturnFalse() 
     {
-        assertEquals(myPasswordVerifier.checkPassword("short"), false);
+        assertEquals(false, myPasswordVerifier.checkPassword("short"));
     }
 
     @Test
     void givenAPasswordOfLengthEqualToEight_WhenCheckPasswordCalled_ThenReturnFalse() 
     {
-        assertEquals(myPasswordVerifier.checkPassword("password"), false);
+        assertEquals(false, myPasswordVerifier.checkPassword("password"));
     }
 
     @Test
     void givenAPasswordOfLengthEqualToEightWithNumbers_WhenCheckPasswordCalled_ThenReturnFalse() 
     {
-        assertEquals(myPasswordVerifier.checkPassword("password1"), false);
+        assertEquals(false, myPasswordVerifier.checkPassword("password1"));
     }
 
     @Test
     void givenAPasswordOfLengthEqualToEightWithSymbols_WhenCheckPasswordCalled_ThenReturnFalse() 
     {
-        assertEquals(myPasswordVerifier.checkPassword("password!"), false);
+        assertEquals(false, myPasswordVerifier.checkPassword("password!"));
     }
 
     @Test
     void givenAPasswordOfLengthEqualToEightWithSymbolsAndNumbers_WhenCheckPasswordCalled_ThenReturnTrue() 
     {
-        assertEquals(myPasswordVerifier.checkPassword("password1!"), true);
+        assertEquals(true, myPasswordVerifier.checkPassword("password1!"));
     }
 }
