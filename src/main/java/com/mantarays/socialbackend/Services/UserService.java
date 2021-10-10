@@ -40,10 +40,10 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public User saveUser(User user)
+    public void saveUser(User user)
     {
-        log.debug("Saving new user \"{}\" to database.", user.getUsername());
-        return userRepo.save(user);
+        log.debug("Saving user \"{}\" to database.", user.getUsername());
+        userRepo.save(user);
     }
 
     @Override
@@ -120,6 +120,27 @@ public class UserService implements UserServiceIntf, UserDetailsService
     public void deleteAll()
     {
         userRepo.deleteAll();
+    }
+
+    @Override
+    public void updatePassword(User user, String password) 
+    {
+        user.setPassword(passwordEncoder.encode(password));
+        userRepo.save(user);
+    }
+
+    @Override
+    public void updateUsername(User user, String username) 
+    {
+        user.setUsername(username);
+        userRepo.save(user);
+    }
+
+    @Override
+    public void updateEmail(User user, String email) 
+    {
+        user.setEmail(email);
+        userRepo.save(user);
     }
     
 }
