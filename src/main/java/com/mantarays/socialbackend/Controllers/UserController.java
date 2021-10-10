@@ -9,6 +9,7 @@ import com.mantarays.socialbackend.Forms.RoleToUserForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
+import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Services.EmailVerification;
 import com.mantarays.socialbackend.Services.PasswordVerification;
@@ -76,6 +77,7 @@ public class UserController
                                                                                 myMap.get("password"), 
                                                                                 myMap.get("email"), 
                                                                                 false, 
+                                                                                new ArrayList<Post>(),
                                                                                 new ArrayList<Role>(), 
                                                                                 new ArrayList<User>() )));
     }
