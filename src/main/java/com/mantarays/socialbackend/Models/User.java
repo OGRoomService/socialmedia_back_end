@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,11 @@ public class User
 
     private String email;
 
-    private boolean loggedIn;
+    private boolean logged_in;
+
+    //TODO should this be OneToMany??? Not sure
+    @OneToMany
+    private List<Post> posts = new ArrayList<Post>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<Role>();
