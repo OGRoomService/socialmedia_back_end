@@ -1,4 +1,4 @@
-package com.mantarays.socialbackend.Services;
+package com.mantarays.socialbackend.VerificationServices;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

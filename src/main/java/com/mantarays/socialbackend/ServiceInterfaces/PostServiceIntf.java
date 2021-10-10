@@ -1,5 +1,6 @@
-package com.mantarays.socialbackend.Services;
+package com.mantarays.socialbackend.ServiceInterfaces;
 
+import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
 
 public interface PostServiceIntf 
@@ -9,9 +10,9 @@ public interface PostServiceIntf
     Post savePost(Post post);
     Post sharePost(Post post);
 
-    void updatePostText(String comment);
+    void updatePostText(Post post, String post_text);
 
     void likePost(Post post);
     void dislikePost(Post post);
-    void commentPost(String comment);
+    void commentPost(Post post, Comment comment);
 }

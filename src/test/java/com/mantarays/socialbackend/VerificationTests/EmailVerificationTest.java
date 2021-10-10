@@ -1,9 +1,9 @@
-package com.mantarays.socialbackend.UserVerificationTests;
+package com.mantarays.socialbackend.VerificationTests;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.mantarays.socialbackend.Services.EmailVerification;
+import com.mantarays.socialbackend.VerificationServices.EmailVerification;
 
 public class EmailVerificationTest
 {
@@ -12,25 +12,25 @@ public class EmailVerificationTest
     @Test
     void givenJustAUsernameString_WhenCheckEmailCalleD_ThenReturnFalse() 
     {
-        assertEquals(myEmailVerifier.checkEmail("email"), false);
+        assertEquals(false, myEmailVerifier.checkEmail("email"));
     }
 
     @Test
     void givenAUsernameStringWithAnAtSymbol_WhenCheckEmailCalleD_ThenReturnFalse() 
     {
-        assertEquals(myEmailVerifier.checkEmail("email@"), false);
+        assertEquals(false, myEmailVerifier.checkEmail("email@"));
     }
 
     @Test
     void givenAUsernameStringWithAnAtSymbolAndADomain_WhenCheckEmailCalleD_ThenReturnFalse() 
     {
-        assertEquals(myEmailVerifier.checkEmail("email@test"), false);
+        assertEquals(false, myEmailVerifier.checkEmail("email@test"));
     }
 
     @Test
     void givenACorrectEmail_WhenCheckEmailCalleD_ThenReturnTrue() 
     {
-        assertEquals(myEmailVerifier.checkEmail("email@test.com"), true);
+        assertEquals(true, myEmailVerifier.checkEmail("email@test.com"));
     }
 
 }
