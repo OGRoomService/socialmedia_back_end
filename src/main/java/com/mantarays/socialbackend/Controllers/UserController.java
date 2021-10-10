@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.mantarays.socialbackend.Forms.RoleToUserForm;
+import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.Role;
-import com.mantarays.socialbackend.Models.RoleToUserForm;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Services.EmailVerification;
@@ -39,11 +40,11 @@ public class UserController
     public ResponseEntity<?> saveUser(@RequestParam Map<String, String> myMap)
     {
         boolean conditionalPassed;
-        UserFailureStrings upForm;
+        UserFailureStringsForm upForm;
         ResponseEntity<?> errorResponse;
         URI uri;
 
-        upForm = new UserFailureStrings();
+        upForm = new UserFailureStringsForm();
         conditionalPassed = true;
 
         if(!usernameVerification.checkUsername(myMap.get("username")))
@@ -70,7 +71,13 @@ public class UserController
 
         
         uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
-        return ResponseEntity.created(uri).body(userService.createUser(new User(0, myMap.get("username"), myMap.get("password"), myMap.get("email"), false, new ArrayList<Role>() )));
+        return ResponseEntity.created(uri).body(userService.createUser(new User(0, 
+                                                                                myMap.get("username"), 
+                                                                                myMap.get("password"), 
+                                                                                myMap.get("email"), 
+                                                                                false, 
+                                                                                new ArrayList<Role>(), 
+                                                                                new ArrayList<User>() )));
     }
 
     @PostMapping("/users/save")
@@ -86,21 +93,14 @@ public class UserController
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
-
-    @PostMapping("/role/addtouser")
-    public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
-    {
-        userService.addRoleToUser(form.getUsername(), form.getRolename());
-        return ResponseEntity.ok().build();
-    }
-
+    
     @GetMapping("/users/deleteAll")
     public ResponseEntity<?> deleteAll()
     {
         userService.deleteAll();
         return ResponseEntity.ok().body("Deleted all user accounts...");
     }
-
+    
     @PostMapping("users/update_email")
     public ResponseEntity<?> updateEmail(@RequestParam Map<String, String> myMap)
     {
@@ -112,7 +112,7 @@ public class UserController
         userService.updateEmail(userService.getUser(myMap.get("username")), myMap.get("email"));
         return ResponseEntity.ok().body("Updated user email.");
     }
-
+    
     @PostMapping("users/update_username")
     public ResponseEntity<?> updateUsername(@RequestParam Map<String, String> myMap)
     {
@@ -124,7 +124,7 @@ public class UserController
         userService.updateUsername(userService.getUser(myMap.get("username")), myMap.get("new_username"));
         return ResponseEntity.ok().body("Updated username.");
     }
-
+    
     @PostMapping("users/update_password")
     public ResponseEntity<?> updatePassword(@RequestParam Map<String, String> myMap)
     {
@@ -136,11 +136,11 @@ public class UserController
         userService.updatePassword(userService.getUser(myMap.get("username")), myMap.get("password"));
         return ResponseEntity.ok().body("Updated password.");
     }
-
-    public class UserFailureStrings
-    {
-        String usernameFailureString;
-        String passwordFailureString;
-        String emailFailureString;
-    }
+    
+        @PostMapping("/role/addtouser")
+        public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
+        {
+            userService.addRoleToUser(form.getUsername(), form.getRolename());
+            return ResponseEntity.ok().build();
+        }
 }

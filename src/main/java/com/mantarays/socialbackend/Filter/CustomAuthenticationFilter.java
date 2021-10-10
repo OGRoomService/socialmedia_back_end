@@ -65,7 +65,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException 
     {
         User user = (User) authentication.getPrincipal();
-        Algorithm algorithm = Algorithm.HMAC256("TotallySecretLoginToken".getBytes()); //TODO create some utility class to encyrpt and decrypt some file with a token?
+        Algorithm algorithm = Algorithm.HMAC256("TotallySecretLoginToken".getBytes());
         String accessToken = JWT.create()
             .withSubject(user.getUsername())
             .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000 )) //10 minutes

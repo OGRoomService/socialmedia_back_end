@@ -121,6 +121,19 @@ public class UserService implements UserServiceIntf, UserDetailsService
     {
         userRepo.deleteAll();
     }
+    @Override
+    public void updateEmail(User user, String email) 
+    {
+        user.setEmail(email);
+        userRepo.save(user);
+    }
+    
+        @Override
+        public void updateUsername(User user, String username) 
+        {
+            user.setUsername(username);
+            userRepo.save(user);
+        }
 
     @Override
     public void updatePassword(User user, String password) 
@@ -130,17 +143,17 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public void updateUsername(User user, String username) 
+    public void addUserToFriendsList(User user, User newFriend) 
     {
-        user.setUsername(username);
-        userRepo.save(user);
+        List<User> friendsList = user.getFriends();
+        friendsList.add(newFriend);
+        user.setFriends(friendsList);
     }
 
     @Override
-    public void updateEmail(User user, String email) 
+    public void removeUserFromFriendsList(User user, User oldFriend) 
     {
-        user.setEmail(email);
-        userRepo.save(user);
+        List<User> friendsList = user.getFriends();
+        friendsList.remove(oldFriend);
     }
-    
 }
