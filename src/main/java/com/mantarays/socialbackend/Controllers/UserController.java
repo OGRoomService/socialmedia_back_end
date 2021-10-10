@@ -74,10 +74,10 @@ public class UserController
     }
 
     @PostMapping("/users/save")
-    public ResponseEntity<User> saveUser(@RequestBody User user)
+    public ResponseEntity<?> saveUser(@RequestBody User user)
     {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
+        return ResponseEntity.created(uri).body("Saved user account");
     }
 
     @PostMapping("/role/save")
@@ -99,6 +99,42 @@ public class UserController
     {
         userService.deleteAll();
         return ResponseEntity.ok().body("Deleted all user accounts...");
+    }
+
+    @PostMapping("users/update_email")
+    public ResponseEntity<?> updateEmail(@RequestParam Map<String, String> myMap)
+    {
+        boolean validEmail = emailVerification.checkEmail(myMap.get("email"));
+        if(!validEmail)
+        {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Email doesnt meet preconditions");
+        }
+        userService.updateEmail(userService.getUser(myMap.get("username")), myMap.get("email"));
+        return ResponseEntity.ok().body("Updated user email.");
+    }
+
+    @PostMapping("users/update_username")
+    public ResponseEntity<?> updateUsername(@RequestParam Map<String, String> myMap)
+    {
+        boolean validNewUsername = usernameVerification.checkUsername(myMap.get("new_username"));
+        if(!validNewUsername)
+        {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Username doesnt meet preconditions");
+        }
+        userService.updateUsername(userService.getUser(myMap.get("username")), myMap.get("new_username"));
+        return ResponseEntity.ok().body("Updated username.");
+    }
+
+    @PostMapping("users/update_password")
+    public ResponseEntity<?> updatePassword(@RequestParam Map<String, String> myMap)
+    {
+        boolean validNewPassword = passwordVerification.checkPassword(myMap.get("password"));
+        if(!validNewPassword)
+        {
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Password doesnt meet preconditions");
+        }
+        userService.updatePassword(userService.getUser(myMap.get("username")), myMap.get("password"));
+        return ResponseEntity.ok().body("Updated password.");
     }
 
     public class UserFailureStrings
