@@ -36,7 +36,7 @@ public class Post
 
     private int dislikes;
 
-    private List<Comment> post_comments;
+    //private List<Comment> post_comments;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

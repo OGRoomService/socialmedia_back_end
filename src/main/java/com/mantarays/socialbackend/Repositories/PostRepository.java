@@ -8,5 +8,5 @@ import com.mantarays.socialbackend.Models.Post;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> 
 {
-    Post findByPostId(Long post_id);
+    //Post findByPostId(Long post_id);
 }
