@@ -4,6 +4,7 @@ import javax.transaction.Transactional;
 
 import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
+import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.PostRepository;
 import com.mantarays.socialbackend.ServiceInterfaces.PostServiceIntf;
 
@@ -43,13 +44,19 @@ public class PostService implements PostServiceIntf
     }
 
     @Override
-    public Post sharePost(Post post) 
+    public Post sharePost(Post post, User user) 
     {
         /**
          * TODO This will like need to take a Post type, and a User type
          * then the user can call user.Addpost(Post) or something idk...
          * We will be working on this much later...
+         * 
+         * Putting in what i THINK would share them...
          */
+        Post new_post = post;
+        new_post.setOriginal_poster_id(post.getPoster_id());
+        new_post.setPoster_id(user.getId());
+        postRepo.save(new_post);
         return null;
     }
 
