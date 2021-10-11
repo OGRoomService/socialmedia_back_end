@@ -27,5 +27,5 @@ public class Comment
     private int dislikes;
 
     //Comments can have comments...
-    private List<Comment> comments;
+    //private List<Comment> comments;
 }
