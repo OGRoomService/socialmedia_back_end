@@ -45,9 +45,8 @@ public class PostService implements PostServiceIntf
     @Override
     public Post sharePost(Post post) 
     {
-        // TODO Make this "share"
         /**
-         * This will like need to take a Post type, and a User type
+         * TODO This will like need to take a Post type, and a User type
          * then the user can call user.Addpost(Post) or something idk...
          * We will be working on this much later...
          */
@@ -76,6 +75,12 @@ public class PostService implements PostServiceIntf
     public void commentPost(Post post, Comment comment) 
     {
         post.getPost_comments().add(comment);
+    }
+
+    @Override
+    public void deletePost(Post post)
+    {
+        postRepo.delete(post);
     }
     
 }

@@ -2,6 +2,7 @@ package com.mantarays.socialbackend;
 
 import com.mantarays.socialbackend.VerificationServices.EmailVerification;
 import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
+import com.mantarays.socialbackend.VerificationServices.PostTextVerification;
 import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
 
 import org.springframework.boot.SpringApplication;
@@ -40,6 +41,12 @@ public class MainServer
 	EmailVerification emailVerification()
 	{
 		return new EmailVerification();
+	}
+
+	@Bean
+	PostTextVerification postTextVerification()
+	{
+		return new PostTextVerification();
 	}
 
 }
