@@ -139,10 +139,10 @@ public class UserController
         return ResponseEntity.ok().body("Updated password.");
     }
     
-        @PostMapping("/role/addtouser")
-        public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
-        {
-            userService.addRoleToUser(form.getUsername(), form.getRolename());
-            return ResponseEntity.ok().build();
-        }
+    @PostMapping("/role/addtouser")
+    public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
+    {
+        userService.addRoleToUser(form.getUsername(), form.getRolename());
+        return ResponseEntity.ok().build();
+    }
 }

@@ -15,4 +15,5 @@ public interface PostServiceIntf
     void likePost(Post post);
     void dislikePost(Post post);
     void commentPost(Post post, Comment comment);
+    void deletePost(Post post);
 }
