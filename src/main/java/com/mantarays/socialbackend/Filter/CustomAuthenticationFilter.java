@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +45,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
-        
+
 
         if(email != null)
         {
@@ -53,7 +54,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
 
         log.info("Trying to login with username: {} , password: {}, email: {}", username, password, email);
-
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
 
@@ -78,6 +78,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000 )) //30 minutes
             .withIssuer(request.getRequestURL().toString())
             .sign(algorithm);
+
+        // Cookie rowanspawn_access_cookie = new Cookie("rowanspace_access_token", accessToken);
+        // Cookie rowanspawn_refresh_cookie = new Cookie("rowanspace_refresh_token", refreshToken);
+        // response.addCookie(rowanspawn_access_cookie);
+        // response.addCookie(rowanspawn_refresh_cookie);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", accessToken);
