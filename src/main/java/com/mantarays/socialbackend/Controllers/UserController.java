@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.JWTVerifier;
 import com.mantarays.socialbackend.Forms.RoleToUserForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.Role;
@@ -17,13 +19,16 @@ import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController 
 {
     private final UserService userService; 
