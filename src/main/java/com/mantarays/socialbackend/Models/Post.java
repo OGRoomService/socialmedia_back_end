@@ -28,6 +28,8 @@ public class Post
 
     private long poster_id;
 
+    private long original_poster_id;
+
     private String post_text;
 
     private int likes;
