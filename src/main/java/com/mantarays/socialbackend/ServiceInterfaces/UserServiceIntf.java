@@ -5,7 +5,7 @@ import java.util.List;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 
-public interface UserServiceIntf 
+public interface UserServiceIntf
 {
     //User commands
     User createUser(User user);
@@ -24,7 +24,8 @@ public interface UserServiceIntf
     //Friendlist stuff
     void addUserToFriendsList(User user, User newFriend);
     void removeUserFromFriendsList(User user, User oldFriend);
-    
-    //TODO probably remove this...
+
+    //TODO probably remove these...
     List<User> getUsers();
+    void deleteAll();
 }
