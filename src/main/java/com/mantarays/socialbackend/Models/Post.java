@@ -1,15 +1,12 @@
 package com.mantarays.socialbackend.Models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import org.springframework.data.annotation.CreatedDate;
-
-import javax.persistence.GenerationType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post 
+public class Post
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,7 +32,8 @@ public class Post
 
     private int dislikes;
 
-    //private List<Comment> post_comments;
+    @OneToMany
+    private List<Comment> post_comments = new ArrayList<Comment>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

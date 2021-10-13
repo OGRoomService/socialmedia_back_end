@@ -1,19 +1,21 @@
 package com.mantarays.socialbackend.Models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment 
+public class Comment
 {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long comment_id;
@@ -24,6 +26,10 @@ public class Comment
 
     private int dislikes;
 
-    //Comments can have comments...
-    //private List<Comment> comments;
+    @OneToMany
+    private List<Comment> comments = new ArrayList<Comment>();
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Date comment_date;
 }
