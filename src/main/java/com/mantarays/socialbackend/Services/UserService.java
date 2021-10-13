@@ -48,14 +48,14 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public Role saveRole(Role role) 
+    public Role saveRole(Role role)
     {
         log.debug("Saving new role \"{}\" to database.", role.getName());
         return roleRepo.save(role);
     }
 
     @Override
-    public void addRoleToUser(String username, String roleName) 
+    public void addRoleToUser(String username, String roleName)
     {
         User user = userRepo.findByUsername(username);
         Role role = roleRepo.findByName(roleName);
@@ -66,7 +66,7 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public User getUser(String username) 
+    public User getUser(String username)
     {
         User user = userRepo.findByUsername(username);
         log.debug("Returning user \"{}\".", user.getUsername());
@@ -74,14 +74,14 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public List<User> getUsers() 
+    public List<User> getUsers()
     {
         log.error("Returning all users. PLEASE DONT USE THIS");
         return userRepo.findAll();
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException 
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
         User user = userRepo.findByUsername(username);
         if(user == null)
@@ -95,14 +95,14 @@ public class UserService implements UserServiceIntf, UserDetailsService
             log.info("User {} found in database", username);
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role -> 
+        user.getRoles().forEach(role ->
         {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         });
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
-    public User loadUserByEmail(String email) throws UsernameNotFoundException 
+    public User loadUserByEmail(String email) throws UsernameNotFoundException
     {
         User user = userRepo.findByEmail(email);
         if(user == null)
@@ -118,39 +118,41 @@ public class UserService implements UserServiceIntf, UserDetailsService
         return user;
     }
 
+    @Override
     public void deleteAll()
     {
         userRepo.deleteAll();
     }
+
     @Override
-    public void updateEmail(User user, String email) 
+    public void updateEmail(User user, String email)
     {
         user.setEmail(email);
         userRepo.save(user);
     }
-    
-        @Override
-        public void updateUsername(User user, String username) 
-        {
-            user.setUsername(username);
-            userRepo.save(user);
-        }
 
     @Override
-    public void updatePassword(User user, String password) 
+    public void updateUsername(User user, String username)
+    {
+        user.setUsername(username);
+        userRepo.save(user);
+    }
+
+    @Override
+    public void updatePassword(User user, String password)
     {
         user.setPassword(passwordEncoder.encode(password));
         userRepo.save(user);
     }
 
     @Override
-    public void addUserToFriendsList(User user, User newFriend) 
+    public void addUserToFriendsList(User user, User newFriend)
     {
         user.getFriends().add(newFriend);
     }
 
     @Override
-    public void removeUserFromFriendsList(User user, User oldFriend) 
+    public void removeUserFromFriendsList(User user, User oldFriend)
     {
         user.getFriends().remove(oldFriend);
     }
