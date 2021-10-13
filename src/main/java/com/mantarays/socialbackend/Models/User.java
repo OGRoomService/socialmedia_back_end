@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User 
+public class User
 {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -32,7 +32,6 @@ public class User
 
     private boolean logged_in;
 
-    //TODO should this be OneToMany??? Not sure
     @OneToMany
     private List<Post> posts = new ArrayList<Post>();
 
