@@ -2,6 +2,7 @@ package com.mantarays.socialbackend.Controllers;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Models.Post;
+import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.VerificationServices.EmailVerification;
 import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
@@ -17,6 +19,8 @@ import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -24,13 +28,14 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class UserController 
+public class UserController
 {
-    private final UserService userService; 
+    private final UserService userService;
     private final UsernameVerification usernameVerification;
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
-  
+    private final RoleRepository roleRepository;
+
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers()
     {
@@ -47,6 +52,17 @@ public class UserController
 
         upForm = new UserFailureStringsForm();
         conditionalPassed = true;
+
+        try //This checks if user already exists
+        {
+            UserDetails user = userService.loadUserByUsername(myMap.get("username"));
+            upForm.usernameFailureString = "Username already exists.";
+            conditionalPassed = false;
+        }
+        catch(UsernameNotFoundException e)
+        {
+            //continue
+        }
 
         if(!usernameVerification.checkUsername(myMap.get("username")))
         {
@@ -70,16 +86,18 @@ public class UserController
             return errorResponse;
         }
 
-        
         uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
-        return ResponseEntity.created(uri).body(userService.createUser(new User(0, 
-                                                                                myMap.get("username"), 
-                                                                                myMap.get("password"), 
-                                                                                myMap.get("email"), 
-                                                                                false, 
-                                                                                new ArrayList<Post>(),
-                                                                                new ArrayList<Role>(), 
-                                                                                new ArrayList<User>() )));
+        User user = new User(0,
+                                myMap.get("username"),
+                                myMap.get("password"),
+                                myMap.get("email"),
+                        false,
+                                new ArrayList<Post>(),
+                                new ArrayList<Role>(),
+                                new ArrayList<User>() );
+        userService.createUser(user);
+        userService.addRoleToUser(user.getUsername(), "ROLE_USER");
+        return ResponseEntity.created(uri).body("OK");
     }
 
     @PostMapping("/users/save")
@@ -95,14 +113,14 @@ public class UserController
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
-    
+
     @GetMapping("/users/deleteAll")
     public ResponseEntity<?> deleteAll()
     {
         userService.deleteAll();
         return ResponseEntity.ok().body("Deleted all user accounts...");
     }
-    
+
     @PostMapping("users/update_email")
     public ResponseEntity<?> updateEmail(@RequestParam Map<String, String> myMap)
     {
@@ -114,7 +132,7 @@ public class UserController
         userService.updateEmail(userService.getUser(myMap.get("username")), myMap.get("email"));
         return ResponseEntity.ok().body("Updated user email.");
     }
-    
+
     @PostMapping("users/update_username")
     public ResponseEntity<?> updateUsername(@RequestParam Map<String, String> myMap)
     {
@@ -126,7 +144,7 @@ public class UserController
         userService.updateUsername(userService.getUser(myMap.get("username")), myMap.get("new_username"));
         return ResponseEntity.ok().body("Updated username.");
     }
-    
+
     @PostMapping("users/update_password")
     public ResponseEntity<?> updatePassword(@RequestParam Map<String, String> myMap)
     {
@@ -138,7 +156,7 @@ public class UserController
         userService.updatePassword(userService.getUser(myMap.get("username")), myMap.get("password"));
         return ResponseEntity.ok().body("Updated password.");
     }
-    
+
     @PostMapping("/role/addtouser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
     {

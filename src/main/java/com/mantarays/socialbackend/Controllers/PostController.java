@@ -75,8 +75,12 @@ public class PostController
             URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/likePost").toUriString());
             Long post_id = Long.valueOf(myMap.get("post_id"));
             Post post = postService.getPost(post_id);
-            postService.likePost(post);
-            return ResponseEntity.ok().build();
+            if(post != null)
+            {
+                postService.likePost(post);
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.badRequest().body("No post with such ID");
         }
         return ResponseEntity.badRequest().body("post_id was null");
     }
