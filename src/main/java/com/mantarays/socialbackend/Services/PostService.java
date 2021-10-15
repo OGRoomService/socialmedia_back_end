@@ -31,9 +31,13 @@ public class PostService implements PostServiceIntf
     @Override
     public Post getPost(Long post_id)
     {
-        Post post = postRepo.getById(post_id);
-        log.info("Returning post: {}, to database", post.getPost_id());
-        return post;
+        if(postRepo.existsById(post_id))
+        {
+            Post post = postRepo.getById(post_id);
+            log.info("Returning post: {}, to database", post.getPost_id());
+            return post;
+        }
+        return null;
     }
 
     @Override
