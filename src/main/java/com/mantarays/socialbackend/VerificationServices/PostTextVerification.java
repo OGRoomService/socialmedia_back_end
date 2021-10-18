@@ -1,6 +1,6 @@
 package com.mantarays.socialbackend.VerificationServices;
 
-public class PostTextVerification 
+public class PostTextVerification
 {
     /**
      * This verifies that a post's text can only
@@ -11,10 +11,6 @@ public class PostTextVerification
      */
     public boolean checkPostText(String text)
     {
-        if(text.length() > 0 && text.length() < 255)
-        {
-            return true;
-        }
-        return false;
+        return text.length() > 0 && text.length() < 255;
     }
 }

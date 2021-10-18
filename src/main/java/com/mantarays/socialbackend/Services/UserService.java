@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
@@ -63,6 +64,18 @@ public class UserService implements UserServiceIntf, UserDetailsService
         log.debug("Saving new role \"{}\" to user \"{}\".", role.getName(), user.getUsername());
 
         user.getRoles().add(role);
+    }
+
+    @Override
+    public void saveRecoveryQuestion(RecoveryQuestion recoveryQuestion)
+    {
+        //TODO implement this
+    }
+
+    @Override
+    public void addRecoveryQuestionToUser(String username, RecoveryQuestion recoveryQuestion)
+    {
+        //TODO implement this
     }
 
     @Override
