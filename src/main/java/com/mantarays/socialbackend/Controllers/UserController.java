@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.mantarays.socialbackend.Forms.RoleToUserForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
+import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Models.Post;
@@ -34,7 +35,6 @@ public class UserController
     private final UsernameVerification usernameVerification;
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
-    private final RoleRepository roleRepository;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers()
@@ -61,23 +61,21 @@ public class UserController
         }
         catch(UsernameNotFoundException e)
         {
-            //continue
-        }
-
-        if(!usernameVerification.checkUsername(myMap.get("username")))
-        {
-            upForm.usernameFailureString = "Username failed preconditions";
-            conditionalPassed = false;
-        }
-        if(!passwordVerification.checkPassword(myMap.get("password")))
-        {
-            upForm.passwordFailureString = "Password failed preconditions";
-            conditionalPassed = false;
-        }
-        if(!emailVerification.checkEmail(myMap.get("email")))
-        {
-            upForm.emailFailureString = "Email failed preconditions";
-            conditionalPassed = false;
+            if(!usernameVerification.checkUsername(myMap.get("username")))
+            {
+                upForm.usernameFailureString = "Username failed preconditions";
+                conditionalPassed = false;
+            }
+            if(!passwordVerification.checkPassword(myMap.get("password")))
+            {
+                upForm.passwordFailureString = "Password failed preconditions";
+                conditionalPassed = false;
+            }
+            if(!emailVerification.checkEmail(myMap.get("email")))
+            {
+                upForm.emailFailureString = "Email failed preconditions";
+                conditionalPassed = false;
+            }
         }
 
         if(!conditionalPassed)
@@ -85,19 +83,24 @@ public class UserController
             errorResponse = ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(upForm);
             return errorResponse;
         }
+        else
+        {
+            uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
+            User user = new User(0,
+                                    myMap.get("username"),
+                                    myMap.get("password"),
+                                    myMap.get("email"),
+                                    false,
+                                    new ArrayList<Post>(),
+                                    new ArrayList<Role>(),
+                                    new ArrayList<User>(),
+                                    new ArrayList<RecoveryQuestion>());
 
-        uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
-        User user = new User(0,
-                                myMap.get("username"),
-                                myMap.get("password"),
-                                myMap.get("email"),
-                        false,
-                                new ArrayList<Post>(),
-                                new ArrayList<Role>(),
-                                new ArrayList<User>() );
-        userService.createUser(user);
-        userService.addRoleToUser(user.getUsername(), "ROLE_USER");
-        return ResponseEntity.created(uri).body("OK");
+            userService.createUser(user);
+            userService.addRoleToUser(user.getUsername(), "ROLE_USER");
+
+            return ResponseEntity.created(uri).body("OK");
+        }
     }
 
     @PostMapping("/users/save")

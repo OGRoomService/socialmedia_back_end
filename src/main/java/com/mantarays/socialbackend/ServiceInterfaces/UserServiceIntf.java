@@ -2,6 +2,7 @@ package com.mantarays.socialbackend.ServiceInterfaces;
 
 import java.util.List;
 
+import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 
@@ -20,6 +21,10 @@ public interface UserServiceIntf
     //Role commands
     Role saveRole(Role role);
     void addRoleToUser(String username, String roleName);
+
+    //RecoveryQuestion commands
+    void saveRecoveryQuestion(RecoveryQuestion recoveryQuestion);
+    void addRecoveryQuestionToUser(String username, RecoveryQuestion recoveryQuestion);
 
     //Friendlist stuff
     void addUserToFriendsList(User user, User newFriend);

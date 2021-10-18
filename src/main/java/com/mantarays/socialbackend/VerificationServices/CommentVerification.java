@@ -1,6 +1,6 @@
 package com.mantarays.socialbackend.VerificationServices;
 
-public class CommentVerification 
+public class CommentVerification
 {
     /**
      * This verifies that a comment's text can only
@@ -11,10 +11,6 @@ public class CommentVerification
      */
     public boolean checkCommentText(String comment_text)
     {
-        if(comment_text.length() > 0 && comment_text.length() < 255)
-        {
-            return true;
-        }
-        return false;
+        return comment_text.length() > 0 && comment_text.length() < 255;
     }
 }
