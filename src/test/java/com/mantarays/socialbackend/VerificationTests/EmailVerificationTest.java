@@ -12,7 +12,7 @@ public class EmailVerificationTest
     @Test
     void givenJustAUsernameString_WhenCheckEmailCalleD_ThenReturnFalse()
     {
-        assertEquals(true, myEmailVerifier.checkEmail("email"));
+        assertEquals(false, myEmailVerifier.checkEmail("email"));
     }
 
     @Test
