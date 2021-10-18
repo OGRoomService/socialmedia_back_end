@@ -23,8 +23,8 @@ public interface UserServiceIntf
     void addRoleToUser(String username, String roleName);
 
     //RecoveryQuestion commands
-    void saveRecoveryQuestion(RecoveryQuestion recoveryQuestion);
     void addRecoveryQuestionToUser(String username, RecoveryQuestion recoveryQuestion);
+    void removeRecoveryQuestionFromUser(String username, RecoveryQuestion recoveryQuestion);
 
     //Friendlist stuff
     void addUserToFriendsList(User user, User newFriend);
