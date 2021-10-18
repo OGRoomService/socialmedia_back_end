@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
+import com.mantarays.socialbackend.Repositories.RecoveryQuestionRepository;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.ServiceInterfaces.UserServiceIntf;
@@ -31,6 +32,7 @@ public class UserService implements UserServiceIntf, UserDetailsService
 {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
+    private final RecoveryQuestionRepository recoveryQuestionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -66,16 +68,19 @@ public class UserService implements UserServiceIntf, UserDetailsService
         user.getRoles().add(role);
     }
 
-    @Override
-    public void saveRecoveryQuestion(RecoveryQuestion recoveryQuestion)
-    {
-        //TODO implement this
-    }
 
     @Override
     public void addRecoveryQuestionToUser(String username, RecoveryQuestion recoveryQuestion)
     {
-        //TODO implement this
+        User user = userRepo.findByUsername(username);
+        user.getRecovery_questions().add(recoveryQuestion);
+    }
+
+    @Override
+    public void removeRecoveryQuestionFromUser(String username, RecoveryQuestion recoveryQuestion)
+    {
+        User user = userRepo.findByUsername(username);
+        user.getRecovery_questions().remove(recoveryQuestion);
     }
 
     @Override
