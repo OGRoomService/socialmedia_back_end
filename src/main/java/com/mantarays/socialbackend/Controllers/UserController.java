@@ -56,29 +56,30 @@ public class UserController
         upForm = new UserFailureStringsForm();
         conditionalPassed = true;
 
-        try //This checks if user already exists
+        if(userService.doesEmailExist(myMap.get("email")))
         {
-            UserDetails user = userService.loadUserByUsername(myMap.get("username"));
-            upForm.usernameFailureString = "Username already exists.";
+            upForm.emailFailureString = "Email already exists";
             conditionalPassed = false;
         }
-        catch(UsernameNotFoundException e)
+        if(userService.doesUsernameExist(myMap.get("username")))
         {
-            if(!usernameVerification.checkUsername(myMap.get("username")))
-            {
-                upForm.usernameFailureString = "Username failed preconditions";
-                conditionalPassed = false;
-            }
-            if(!passwordVerification.checkPassword(myMap.get("password")))
-            {
-                upForm.passwordFailureString = "Password failed preconditions";
-                conditionalPassed = false;
-            }
-            if(!emailVerification.checkEmail(myMap.get("email")))
-            {
-                upForm.emailFailureString = "Email failed preconditions";
-                conditionalPassed = false;
-            }
+            upForm.usernameFailureString = "Username already exists";
+            conditionalPassed = false;
+        }
+        if(!usernameVerification.checkUsername(myMap.get("username")))
+        {
+            upForm.usernameFailureString = "Username failed preconditions";
+            conditionalPassed = false;
+        }
+        if(!passwordVerification.checkPassword(myMap.get("password")))
+        {
+            upForm.passwordFailureString = "Password failed preconditions";
+            conditionalPassed = false;
+        }
+        if(!emailVerification.checkEmail(myMap.get("email")))
+        {
+            upForm.emailFailureString = "Email failed preconditions";
+            conditionalPassed = false;
         }
 
         if(!conditionalPassed)

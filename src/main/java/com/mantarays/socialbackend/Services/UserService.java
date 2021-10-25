@@ -120,6 +120,32 @@ public class UserService implements UserServiceIntf, UserDetailsService
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
+    public boolean doesEmailExist(String email)
+    {
+        try
+        {
+            User user = loadUserByEmail(email);
+            return true;
+        }
+        catch(UsernameNotFoundException e)
+        {
+            return false;
+        }
+    }
+
+    public boolean doesUsernameExist(String username)
+    {
+        try
+        {
+            org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) loadUserByUsername(username);
+            return true;
+        }
+        catch(UsernameNotFoundException e)
+        {
+            return false;
+        }
+    }
+
     public User loadUserByEmail(String email) throws UsernameNotFoundException
     {
         User user = userRepo.findByEmail(email);
