@@ -22,11 +22,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig extends WebSecurityConfigurerAdapter
+public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer
 {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -46,7 +48,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), new UserService(userRepo, roleRepo, recoveryQuestionRepository, passwordEncoder));
 
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/login/**").permitAll();
@@ -60,6 +61,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry)
+    {
+        registry.addMapping("/**").allowedMethods("*");
     }
 
     @Bean
