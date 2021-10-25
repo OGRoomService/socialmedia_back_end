@@ -53,14 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), new UserService(userRepo, roleRepo, recoveryQuestionRepository, passwordEncoder));
 
-        http.cors().and().csrf().disable()//
-            .authorizeRequests()//
-            .antMatchers("*").permitAll()//
-            .anyRequest().authenticated()
-            .and()
-            .sessionManagement()//
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/login/**").permitAll();
 //        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/getUserPosts").permitAll();
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/createPost").permitAll(); //TODO remove
@@ -69,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/role/save").permitAll(); //TODO remove
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/create").permitAll();
 //        //http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests().anyRequest().permitAll();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
