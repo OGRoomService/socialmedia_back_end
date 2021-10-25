@@ -53,8 +53,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), new UserService(userRepo, roleRepo, recoveryQuestionRepository, passwordEncoder));
 
-        http.cors();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors().and().csrf().disable()//
+            .authorizeRequests()//
+            .antMatchers("*").permitAll()//
+            .anyRequest().authenticated()
+            .and()
+            .sessionManagement()//
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/login/**").permitAll();
 //        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/getUserPosts").permitAll();
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/createPost").permitAll(); //TODO remove
