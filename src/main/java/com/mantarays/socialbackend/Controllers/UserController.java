@@ -27,7 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController
@@ -37,14 +37,14 @@ public class UserController
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers()
     {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/create")
     public ResponseEntity<?> saveUser(@RequestParam Map<String, String> myMap)
     {
@@ -106,7 +106,7 @@ public class UserController
         }
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/save")
     public ResponseEntity<?> saveUser(@RequestBody User user)
     {
@@ -114,7 +114,7 @@ public class UserController
         return ResponseEntity.created(uri).body("Saved user account");
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/role/save")
     public ResponseEntity<Role> saveRole(@RequestBody Role role)
     {
@@ -122,7 +122,7 @@ public class UserController
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users/deleteAll")
     public ResponseEntity<?> deleteAll()
     {
@@ -130,7 +130,7 @@ public class UserController
         return ResponseEntity.ok().body("Deleted all user accounts...");
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("users/update_email")
     public ResponseEntity<?> updateEmail(@RequestParam Map<String, String> myMap)
     {
@@ -143,7 +143,7 @@ public class UserController
         return ResponseEntity.ok().body("Updated user email.");
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("users/update_username")
     public ResponseEntity<?> updateUsername(@RequestParam Map<String, String> myMap)
     {
@@ -156,7 +156,7 @@ public class UserController
         return ResponseEntity.ok().body("Updated username.");
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("users/update_password")
     public ResponseEntity<?> updatePassword(@RequestParam Map<String, String> myMap)
     {
@@ -169,7 +169,7 @@ public class UserController
         return ResponseEntity.ok().body("Updated password.");
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/role/addtouser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
     {
