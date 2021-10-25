@@ -46,7 +46,7 @@ public class UserController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/create")
-    public ResponseEntity<?> saveUser(@RequestParam Map<String, String> myMap)
+    public ResponseEntity<?> saveUser(@RequestBody Map<String, String> myMap)
     {
         boolean conditionalPassed;
         UserFailureStringsForm upForm;
