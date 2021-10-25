@@ -22,8 +22,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -48,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), new UserService(userRepo, roleRepo, recoveryQuestionRepository, passwordEncoder));
 
-        http.csrf().disable();
+        http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/login/**").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/getUserPosts").permitAll();
@@ -61,6 +66,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration configuration = new CorsConfiguration();
+        List<String> allowedOrigins = new ArrayList<>();
+        allowedOrigins.add("*");
+        List<String> allowedMethods = new ArrayList<>();
+        allowedMethods.add("HEAD");
+        allowedMethods.add("GET");
+        allowedMethods.add("POST");
+        allowedMethods.add("PUT");
+        allowedMethods.add("DELETE");
+        allowedMethods.add("PATCH");
+        List<String> allowedHeaders = new ArrayList<>();
+        allowedHeaders.add("Authorization");
+        allowedHeaders.add("Cache-Control");
+        allowedHeaders.add("Content-Type");
+        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedMethods(allowedMethods);
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(allowedHeaders);
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Override
