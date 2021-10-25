@@ -55,15 +55,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/login/**").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/getUserPosts").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/createPost").permitAll(); //TODO remove
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/likePost").permitAll(); //TODO remove
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users").permitAll(); //TODO remove
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/role/save").permitAll(); //TODO remove
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/create").permitAll();
-        //http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
-        http.authorizeRequests().anyRequest().authenticated();
+//        http.authorizeRequests().antMatchers(HttpMethod.POST, "/login/**").permitAll();
+//        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/getUserPosts").permitAll();
+//        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/createPost").permitAll(); //TODO remove
+//        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/likePost").permitAll(); //TODO remove
+//        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users").permitAll(); //TODO remove
+//        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/role/save").permitAll(); //TODO remove
+//        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/create").permitAll();
+//        //http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
+//        http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
