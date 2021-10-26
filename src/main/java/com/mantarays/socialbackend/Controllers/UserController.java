@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mantarays.socialbackend.Forms.RoleToUserForm;
+import com.mantarays.socialbackend.Forms.StandardReturnForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
@@ -48,48 +49,44 @@ public class UserController
     @PostMapping("/users/create")
     public ResponseEntity<?> saveUser(@RequestBody Map<String, String> myMap)
     {
-        boolean conditionalPassed;
-        UserFailureStringsForm upForm;
+        boolean conditionalPassed = true;
+        UserFailureStringsForm failureStrings = new UserFailureStringsForm();
+        StandardReturnForm returnForm = new StandardReturnForm();
         ResponseEntity<?> errorResponse;
-        URI uri;
-
-        upForm = new UserFailureStringsForm();
-        conditionalPassed = true;
 
         if(userService.doesEmailExist(myMap.get("email")))
         {
-            upForm.emailFailureString = "Email already exists";
+            failureStrings.emailFailureString = "Email already exists";
             conditionalPassed = false;
         }
         if(userService.doesUsernameExist(myMap.get("username")))
         {
-            upForm.usernameFailureString = "Username already exists";
+            failureStrings.usernameFailureString = "Username already exists";
             conditionalPassed = false;
         }
         if(!usernameVerification.checkUsername(myMap.get("username")))
         {
-            upForm.usernameFailureString = "Username failed preconditions";
+            failureStrings.usernameFailureString = "Username failed preconditions";
             conditionalPassed = false;
         }
         if(!passwordVerification.checkPassword(myMap.get("password")))
         {
-            upForm.passwordFailureString = "Password failed preconditions";
+            failureStrings.passwordFailureString = "Password failed preconditions";
             conditionalPassed = false;
         }
         if(!emailVerification.checkEmail(myMap.get("email")))
         {
-            upForm.emailFailureString = "Email failed preconditions";
+            failureStrings.emailFailureString = "Email failed preconditions";
             conditionalPassed = false;
         }
-
         if(!conditionalPassed)
         {
-            errorResponse = ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(upForm);
+            errorResponse = ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(failureStrings);
             return errorResponse;
         }
         else
         {
-            uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
+            URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
             User user = new User(0,
                                     myMap.get("username"),
                                     myMap.get("password"),
@@ -102,8 +99,8 @@ public class UserController
 
             userService.createUser(user);
             userService.addRoleToUser(user.getUsername(), "ROLE_USER");
-
-            return ResponseEntity.created(uri).body("New user added to database.");
+            returnForm.message = "New user added to database.";
+            return ResponseEntity.created(uri).body(returnForm);
         }
     }
 
