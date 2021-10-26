@@ -52,7 +52,6 @@ public class UserController
         boolean conditionalPassed = true;
         UserFailureStringsForm failureStrings = new UserFailureStringsForm();
         StandardReturnForm returnForm = new StandardReturnForm();
-        ResponseEntity<?> errorResponse;
 
         if(userService.doesEmailExist(myMap.get("email")))
         {
@@ -81,8 +80,7 @@ public class UserController
         }
         if(!conditionalPassed)
         {
-            errorResponse = ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(failureStrings);
-            return errorResponse;
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(failureStrings);
         }
         else
         {
@@ -100,7 +98,8 @@ public class UserController
             userService.createUser(user);
             userService.addRoleToUser(user.getUsername(), "ROLE_USER");
             returnForm.message = "New user added to database.";
-            return ResponseEntity.created(uri).body(returnForm);
+            return ResponseEntity.internalServerError().body(new String[]{"eat pant"});
+            //return ResponseEntity.created(uri).body(returnForm);
         }
     }
 
