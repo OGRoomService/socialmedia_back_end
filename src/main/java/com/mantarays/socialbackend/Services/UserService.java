@@ -146,6 +146,14 @@ public class UserService implements UserServiceIntf, UserDetailsService
         }
     }
 
+    public boolean doesRoleExist(String inrole)
+    {
+        Role role = roleRepo.findByName(inrole);
+        if(role != null)
+            return true;
+        return false;
+    }
+
     public User loadUserByEmail(String email) throws UsernameNotFoundException
     {
         User user = userRepo.findByEmail(email);

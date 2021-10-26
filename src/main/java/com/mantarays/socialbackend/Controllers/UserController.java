@@ -17,6 +17,7 @@ import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.VerificationServices.EmailVerification;
 import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
+import com.mantarays.socialbackend.VerificationServices.UserVerification;
 import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
 
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ public class UserController
     private final UsernameVerification usernameVerification;
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
+    private UserVerification userVerification;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users")
@@ -49,36 +51,11 @@ public class UserController
     @PostMapping("/users/create")
     public ResponseEntity<?> saveUser(@RequestBody Map<String, String> myMap)
     {
-        boolean conditionalPassed = true;
         UserFailureStringsForm failureStrings = new UserFailureStringsForm();
         StandardReturnForm returnForm = new StandardReturnForm();
+        userVerification = new UserVerification(userService, usernameVerification, passwordVerification, emailVerification);
 
-        if(userService.doesEmailExist(myMap.get("email")))
-        {
-            failureStrings.emailFailureString = "Email already exists";
-            conditionalPassed = false;
-        }
-        if(userService.doesUsernameExist(myMap.get("username")))
-        {
-            failureStrings.usernameFailureString = "Username already exists";
-            conditionalPassed = false;
-        }
-        if(!usernameVerification.checkUsername(myMap.get("username")))
-        {
-            failureStrings.usernameFailureString = "Username failed preconditions";
-            conditionalPassed = false;
-        }
-        if(!passwordVerification.checkPassword(myMap.get("password")))
-        {
-            failureStrings.passwordFailureString = "Password failed preconditions";
-            conditionalPassed = false;
-        }
-        if(!emailVerification.checkEmail(myMap.get("email")))
-        {
-            failureStrings.emailFailureString = "Email failed preconditions";
-            conditionalPassed = false;
-        }
-        if(!conditionalPassed)
+        if(!userVerification.doesAccountPassPreconditions(myMap, failureStrings))
         {
             return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(failureStrings);
         }
@@ -98,8 +75,7 @@ public class UserController
             userService.createUser(user);
             userService.addRoleToUser(user.getUsername(), "ROLE_USER");
             returnForm.message = "New user added to database.";
-            return ResponseEntity.internalServerError().body(new String[]{"eat pant"});
-            //return ResponseEntity.created(uri).body(returnForm);
+            return ResponseEntity.created(uri).body(returnForm);
         }
     }
 
@@ -113,9 +89,15 @@ public class UserController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/role/save")
-    public ResponseEntity<Role> saveRole(@RequestBody Role role)
+    public ResponseEntity<?> saveRole(@RequestBody Role role)
     {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
+        StandardReturnForm returnForm = new StandardReturnForm();
+        if(userService.doesRoleExist(role.getName()))
+        {
+            returnForm.message = "Role already exists";
+            return ResponseEntity.badRequest().body(returnForm);
+        }
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
