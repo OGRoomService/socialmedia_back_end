@@ -103,7 +103,7 @@ public class UserController
             userService.createUser(user);
             userService.addRoleToUser(user.getUsername(), "ROLE_USER");
 
-            return ResponseEntity.created(uri).body("OK");
+            return ResponseEntity.created(uri).body("New user added to database.");
         }
     }
 
