@@ -14,11 +14,9 @@ import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
+import com.mantarays.socialbackend.Services.RecoveryQuestionService;
 import com.mantarays.socialbackend.Services.UserService;
-import com.mantarays.socialbackend.VerificationServices.EmailVerification;
-import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
-import com.mantarays.socialbackend.VerificationServices.UserVerification;
-import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
+import com.mantarays.socialbackend.VerificationServices.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +36,7 @@ public class UserController
     private final UsernameVerification usernameVerification;
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
+    private final RecoveryQuestionVerification recoveryQuestionVerification;
     private UserVerification userVerification;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -53,7 +52,7 @@ public class UserController
     {
         UserFailureStringsForm failureStrings = new UserFailureStringsForm();
         StandardReturnForm returnForm = new StandardReturnForm();
-        userVerification = new UserVerification(userService, usernameVerification, passwordVerification, emailVerification);
+        userVerification = new UserVerification(userService, usernameVerification, passwordVerification, emailVerification, recoveryQuestionVerification);
 
         if(!userVerification.doesAccountPassPreconditions(myMap, failureStrings))
         {
@@ -72,8 +71,15 @@ public class UserController
                                     new ArrayList<User>(),
                                     new ArrayList<RecoveryQuestion>());
 
+
             userService.createUser(user);
+
+            userService.createRecoveryQuestion(user, myMap.get("recovery_question_1"), myMap.get("recovery_answer_1"));
+            userService.createRecoveryQuestion(user, myMap.get("recovery_question_2"), myMap.get("recovery_answer_2"));
+            userService.createRecoveryQuestion(user, myMap.get("recovery_question_3"), myMap.get("recovery_answer_3"));
+
             userService.addRoleToUser(user.getUsername(), "ROLE_USER");
+
             returnForm.message = "New user added to database.";
             return ResponseEntity.created(uri).body(returnForm);
         }
