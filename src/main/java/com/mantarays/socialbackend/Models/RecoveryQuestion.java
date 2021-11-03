@@ -18,6 +18,8 @@ public class RecoveryQuestion
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long recovery_id;
 
+    private Long user_id;
+
     private String question;
 
     private String answer;

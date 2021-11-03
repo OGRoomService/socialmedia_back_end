@@ -68,12 +68,28 @@ public class UserService implements UserServiceIntf, UserDetailsService
         user.getRoles().add(role);
     }
 
-
     @Override
-    public void addRecoveryQuestionToUser(String username, RecoveryQuestion recoveryQuestion)
+    public void createRecoveryQuestion(User user, String question, String answer)
+    {
+        RecoveryQuestion recovQuestion = new RecoveryQuestion();
+
+        recovQuestion.setQuestion(question);
+        recovQuestion.setAnswer(answer);
+        recovQuestion.setUser_id(user.getId());
+
+        recoveryQuestionRepository.save(recovQuestion);
+
+        addRecoveryQuestionToUser(user.getUsername(), recovQuestion);
+    }
+
+    private void addRecoveryQuestionToUser(String username, RecoveryQuestion recoveryQuestion)
     {
         User user = userRepo.findByUsername(username);
-        user.getRecovery_questions().add(recoveryQuestion);
+        if(user.getRecovery_questions().size() < 3)
+        {
+            recoveryQuestion.setUser_id(user.getId());
+            user.getRecovery_questions().add(recoveryQuestion);
+        }
     }
 
     @Override
