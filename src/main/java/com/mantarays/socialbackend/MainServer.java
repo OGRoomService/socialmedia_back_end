@@ -1,9 +1,6 @@
 package com.mantarays.socialbackend;
 
-import com.mantarays.socialbackend.VerificationServices.EmailVerification;
-import com.mantarays.socialbackend.VerificationServices.PasswordVerification;
-import com.mantarays.socialbackend.VerificationServices.PostTextVerification;
-import com.mantarays.socialbackend.VerificationServices.UsernameVerification;
+import com.mantarays.socialbackend.VerificationServices.*;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -63,5 +60,10 @@ public class MainServer
 	{
 		return new PostTextVerification();
 	}
+
+	@Bean RecoveryQuestionVerification recoveryQuestionVerification()
+    {
+        return new RecoveryQuestionVerification();
+    }
 
 }

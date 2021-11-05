@@ -16,6 +16,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mantarays.socialbackend.Services.UserService;
 
+import com.mantarays.socialbackend.Utilities.TokenUtility;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,19 +28,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter 
+public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter
 {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final TokenUtility tokenUtility;
 
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService)
     {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
+        this.tokenUtility = new TokenUtility(userService);
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException 
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException
     {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -58,34 +61,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         return authenticationManager.authenticate(authenticationToken);
     }
-    
+
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException 
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException
     {
-        User user = (User) authentication.getPrincipal();
-        Algorithm algorithm = Algorithm.HMAC256("TotallySecretLoginToken".getBytes());
-        String accessToken = JWT.create()
-            .withSubject(user.getUsername())
-            .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000 )) //10 minutes
-            .withIssuer(request.getRequestURL().toString())
-            .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-            .sign(algorithm);
-
-        String refreshToken = JWT.create()
-            .withSubject(user.getUsername())
-            .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000 )) //30 minutes
-            .withIssuer(request.getRequestURL().toString())
-            .sign(algorithm);
-
-        // Cookie rowanspawn_access_cookie = new Cookie("rowanspace_access_token", accessToken);
-        // Cookie rowanspawn_refresh_cookie = new Cookie("rowanspace_refresh_token", refreshToken);
-        // response.addCookie(rowanspawn_access_cookie);
-        // response.addCookie(rowanspawn_refresh_cookie);
-
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("access_token", accessToken);
-        tokens.put("refresh_token", refreshToken);
+        Map<String, String> tokens = tokenUtility.generateNewUserTokens(request, authentication);
         response.setContentType("application/json");
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
