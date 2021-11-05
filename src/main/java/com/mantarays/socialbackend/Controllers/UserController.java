@@ -1,6 +1,7 @@
 package com.mantarays.socialbackend.Controllers;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
 
@@ -8,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mantarays.socialbackend.Forms.RoleToUserForm;
 import com.mantarays.socialbackend.Forms.StandardReturnForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
-import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Models.Post;
@@ -16,13 +16,18 @@ import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,6 +43,9 @@ public class UserController
     private final EmailVerification emailVerification;
     private final RecoveryQuestionVerification recoveryQuestionVerification;
     private UserVerification userVerification;
+
+    @Autowired
+    private JavaMailSender emailSender;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users")
@@ -68,15 +76,10 @@ public class UserController
                                     false,
                                     new ArrayList<Post>(),
                                     new ArrayList<Role>(),
-                                    new ArrayList<User>(),
-                                    new ArrayList<RecoveryQuestion>());
+                                    new ArrayList<User>());
 
 
             userService.createUser(user);
-
-            userService.createRecoveryQuestion(user, myMap.get("recovery_question_1"), myMap.get("recovery_answer_1"));
-            userService.createRecoveryQuestion(user, myMap.get("recovery_question_2"), myMap.get("recovery_answer_2"));
-            userService.createRecoveryQuestion(user, myMap.get("recovery_question_3"), myMap.get("recovery_answer_3"));
 
             userService.addRoleToUser(user.getUsername(), "ROLE_USER");
 
@@ -159,6 +162,27 @@ public class UserController
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
     {
         userService.addRoleToUser(form.getUsername(), form.getRolename());
+        return ResponseEntity.ok().build();
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/sendemail")
+    public ResponseEntity<?> sendEmail() throws UnsupportedEncodingException, MessagingException
+    {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setFrom("RowanSpaceSocial@gmail.com", "Rowanspace Support");
+        helper.setTo("Lehquack@gmail.com");
+
+        String subject = "Password reset link.";
+        String content = "<p> LETS GOOOOOOO </p>";
+
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        emailSender.send(message);
+
         return ResponseEntity.ok().build();
     }
 

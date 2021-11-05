@@ -2,7 +2,6 @@ package com.mantarays.socialbackend.Security;
 
 import com.mantarays.socialbackend.Filter.CustomAuthenticationFilter;
 import com.mantarays.socialbackend.Filter.CustomAuthorizationFilter;
-import com.mantarays.socialbackend.Repositories.RecoveryQuestionRepository;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.Services.UserService;
@@ -39,7 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
-    private final RecoveryQuestionRepository recoveryQuestionRepository;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception
@@ -51,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), new UserService(userRepo, roleRepo, recoveryQuestionRepository, passwordEncoder));
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), new UserService(userRepo, roleRepo, passwordEncoder));
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -59,6 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/createPost").permitAll(); //TODO remove
 //        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/likePost").permitAll(); //TODO remove
 //        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users").permitAll(); //TODO remove
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/sendemail").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/role/save").permitAll(); //TODO remove
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/create").permitAll();

@@ -20,11 +20,20 @@ public class TokenUtility
 {
     private final UserService userService;
     private final Algorithm algorithm;
+    private final long DAY;
+    private final long WEEK;
+    private final long MONTH;
+    private final long YEAR;
 
     public TokenUtility(final UserService userService)
     {
         this.userService = userService;
         this.algorithm = Algorithm.HMAC256("TotallySecretLoginToken".getBytes());
+
+        this.DAY = System.currentTimeMillis() + (24 * 60 * 60 * 1000);
+        this.WEEK = this.DAY * 7;
+        this.MONTH = this.WEEK * 4;
+        this.YEAR = this.MONTH * 12;
     }
 
     public Map<String, String> generateNewAccessTokenFromRefreshToken(HttpServletRequest request)
@@ -38,7 +47,7 @@ public class TokenUtility
 
         String accessToken = JWT.create()
             .withSubject(user.getUsername())
-            .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000 )) //10 minutes
+            .withExpiresAt(new Date(this.WEEK))
             .withIssuer(request.getRequestURL().toString())
             .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
             .sign(algorithm);
@@ -56,14 +65,14 @@ public class TokenUtility
 
         String accessToken = JWT.create()
             .withSubject(user.getUsername())
-            .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000 )) //10 minutes
+            .withExpiresAt(new Date(this.WEEK))
             .withIssuer(request.getRequestURL().toString())
             .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
             .sign(algorithm);
 
         String refreshToken = JWT.create()
             .withSubject(user.getUsername())
-            .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000 )) //30 minutes
+            .withExpiresAt(new Date(this.YEAR))
             .withIssuer(request.getRequestURL().toString())
             .sign(algorithm);
 
