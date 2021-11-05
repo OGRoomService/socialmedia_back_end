@@ -1,11 +1,10 @@
 package com.mantarays.socialbackend.Controllers;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mantarays.socialbackend.Forms.RoleToUserForm;
 import com.mantarays.socialbackend.Forms.StandardReturnForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
@@ -13,19 +12,20 @@ import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Models.Post;
-import com.mantarays.socialbackend.Repositories.RoleRepository;
-import com.mantarays.socialbackend.Services.RecoveryQuestionService;
 import com.mantarays.socialbackend.Services.UserService;
+import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api")
@@ -159,6 +159,41 @@ public class UserController
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
     {
         userService.addRoleToUser(form.getUsername(), form.getRolename());
+        return ResponseEntity.ok().build();
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/token/refresh")
+    public ResponseEntity<?> getNewToken(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer "))
+        {
+            try
+            {
+                TokenUtility tokenUtility = new TokenUtility(userService);
+                Map<String, String> tokens = tokenUtility.generateNewAccessTokenFromRefreshToken(request);
+
+                response.setContentType("application/json");
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            }
+            catch(Exception e)
+            {
+                response.setHeader("error", e.getMessage());
+                response.setStatus(403);
+
+                Map<String, String> error = new HashMap<>();
+                error.put("error_message", e.getMessage());
+                response.setContentType("application/json");
+                new ObjectMapper().writeValue(response.getOutputStream(), error);
+            }
+        }
+        else
+        {
+            throw new RuntimeException("Refresh token is missing");
+        }
+
         return ResponseEntity.ok().build();
     }
 }

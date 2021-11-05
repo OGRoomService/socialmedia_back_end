@@ -31,9 +31,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter
 {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException 
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
     {
-        if(request.getServletPath().equals("/api/login"))
+        if(request.getServletPath().equals("/api/login") || request.getServletPath().equals("/api/token/refresh"))
         {
             filterChain.doFilter(request, response);
         }
@@ -54,7 +54,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     Stream<String> stream = Arrays.stream(roles);
 
-                    stream.forEach(role -> 
+                    stream.forEach(role ->
                     {
                         authorities.add(new SimpleGrantedAuthority(role));
                     });
@@ -66,7 +66,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter
                 }
                 catch(Exception e)
                 {
-                    log.error("Error logging inL {} ", e.getMessage());
+                    log.error("Error logging in {} ", e.getMessage());
                     response.setHeader("error", e.getMessage());
                     response.setStatus(403);
                     //response.sendError(403, e.getMessage());
@@ -83,5 +83,5 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter
             }
         }
     }
-    
+
 }
