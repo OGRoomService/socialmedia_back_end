@@ -6,10 +6,8 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import com.mantarays.socialbackend.Models.RecoveryQuestion;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
-import com.mantarays.socialbackend.Repositories.RecoveryQuestionRepository;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.ServiceInterfaces.UserServiceIntf;
@@ -32,7 +30,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
 {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
-    private final RecoveryQuestionRepository recoveryQuestionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -66,37 +63,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
         log.debug("Saving new role \"{}\" to user \"{}\".", role.getName(), user.getUsername());
 
         user.getRoles().add(role);
-    }
-
-    @Override
-    public void createRecoveryQuestion(User user, String question, String answer)
-    {
-        RecoveryQuestion recovQuestion = new RecoveryQuestion();
-
-        recovQuestion.setQuestion(question);
-        recovQuestion.setAnswer(answer);
-        recovQuestion.setUser_id(user.getId());
-
-        recoveryQuestionRepository.save(recovQuestion);
-
-        addRecoveryQuestionToUser(user.getUsername(), recovQuestion);
-    }
-
-    private void addRecoveryQuestionToUser(String username, RecoveryQuestion recoveryQuestion)
-    {
-        User user = userRepo.findByUsername(username);
-        if(user.getRecovery_questions().size() < 3)
-        {
-            recoveryQuestion.setUser_id(user.getId());
-            user.getRecovery_questions().add(recoveryQuestion);
-        }
-    }
-
-    @Override
-    public void removeRecoveryQuestionFromUser(String username, RecoveryQuestion recoveryQuestion)
-    {
-        User user = userRepo.findByUsername(username);
-        user.getRecovery_questions().remove(recoveryQuestion);
     }
 
     @Override

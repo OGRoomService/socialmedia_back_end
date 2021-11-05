@@ -40,7 +40,4 @@ public class User
 
     @ManyToMany
     private List<User> friends = new ArrayList<User>();
-
-    @OneToMany
-    private List<RecoveryQuestion> recovery_questions = new ArrayList<RecoveryQuestion>();
 }
