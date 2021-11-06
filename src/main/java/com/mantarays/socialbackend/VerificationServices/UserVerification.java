@@ -11,19 +11,16 @@ public class UserVerification
     private final UsernameVerification usernameVerification;
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
-    private final RecoveryQuestionVerification recoveryQuestionVerification;
 
     public UserVerification(final UserService userService,
                             final UsernameVerification usernameVerification,
                             final PasswordVerification passwordVerification,
-                            final EmailVerification emailVerification,
-                            final RecoveryQuestionVerification recoveryQuestionVerification)
+                            final EmailVerification emailVerification)
     {
         this.userService = userService;
         this.usernameVerification = usernameVerification;
         this.passwordVerification = passwordVerification;
         this.emailVerification = emailVerification;
-        this.recoveryQuestionVerification = recoveryQuestionVerification;
     }
 
     public boolean doesAccountPassPreconditions(Map<String, String> inAccount, UserFailureStringsForm failureStrings)
@@ -54,22 +51,6 @@ public class UserVerification
             failureStrings.emailFailureString = "Email failed preconditions";
             allPass = false;
         }
-        if(!recoveryQuestionVerification.verifyRecoveryQuestionAnswer(inAccount.get("recovery_answer_1")))
-        {
-            failureStrings.recoveryQuestion1FailureString = "Recovery question 1 failed verification.";
-            allPass = false;
-        }
-        if(!recoveryQuestionVerification.verifyRecoveryQuestionAnswer(inAccount.get("recovery_answer_2")))
-        {
-            failureStrings.recoveryQuestion2FailureString = "Recovery question 2 failed verification.";
-            allPass = false;
-        }
-        if(!recoveryQuestionVerification.verifyRecoveryQuestionAnswer(inAccount.get("recovery_answer_3")))
-        {
-            failureStrings.recoveryQuestion3FailureString = "Recovery question 3 failed verification.";
-            allPass = false;
-        }
-
         return allPass;
     }
 }
