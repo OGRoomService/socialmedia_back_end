@@ -67,7 +67,7 @@ public class UserController
     {
         UserFailureStringsForm failureStrings = new UserFailureStringsForm();
         StandardReturnForm returnForm = new StandardReturnForm();
-        userVerification = new UserVerification(userService, usernameVerification, passwordVerification, emailVerification, recoveryQuestionVerification);
+        userVerification = new UserVerification(userService, usernameVerification, passwordVerification, emailVerification);
 
         if(!userVerification.doesAccountPassPreconditions(myMap, failureStrings))
         {
@@ -76,14 +76,9 @@ public class UserController
         else
         {
             URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
-            User user = new User(0,
-                                    myMap.get("username"),
+            User user = new User(   myMap.get("username"),
                                     myMap.get("password"),
-                                    myMap.get("email"),
-                                    false,
-                                    new ArrayList<Post>(),
-                                    new ArrayList<Role>(),
-                                    new ArrayList<User>());
+                                    myMap.get("email"));
 
 
             userService.createUser(user);

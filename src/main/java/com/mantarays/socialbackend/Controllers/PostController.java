@@ -32,20 +32,13 @@ public class PostController
     private final UserRepository userRepository;
     private final PostTextVerification postTextVerification;
 
-    @PostMapping("/posts/createPost")
-    public ResponseEntity<?> createPost(@RequestParam Map<String, String> myMap)
+    @PostMapping("/posts/createpost")
+    public ResponseEntity<?> createPost(@RequestBody Map<String, String> myMap)
     {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/createPost").toUriString());
-        Post post = new Post(
-            0,
-            Long.valueOf(myMap.get("poster_id")),
-            Long.valueOf(myMap.get("original_poster_id")),
-            myMap.get("post_text"),
-            0,
-            0,
-            new ArrayList<Comment>(),
-            new Date()
-        );
+        Post post = new Post(Long.valueOf(myMap.get("poster_id")),
+                             myMap.get("post_text"));
+
         User user = userRepository.findById(Long.valueOf(myMap.get("poster_id"))).get();
         user.getPosts().add(post);
         postService.createPost(post);
