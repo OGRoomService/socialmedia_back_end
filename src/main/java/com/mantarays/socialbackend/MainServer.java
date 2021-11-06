@@ -1,5 +1,7 @@
 package com.mantarays.socialbackend;
 
+import com.mantarays.socialbackend.Repositories.UserRepository;
+import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
 import org.springframework.boot.SpringApplication;

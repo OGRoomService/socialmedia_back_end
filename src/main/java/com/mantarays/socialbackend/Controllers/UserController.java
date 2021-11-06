@@ -12,6 +12,7 @@ import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Models.Post;
+import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
@@ -21,6 +22,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -42,6 +47,8 @@ public class UserController
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
     private final RecoveryQuestionVerification recoveryQuestionVerification;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepo;
     private UserVerification userVerification;
 
     @Autowired
@@ -187,6 +194,35 @@ public class UserController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/users/login")
+    public ResponseEntity<?> overloadedLogin(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException
+    {
+        try
+        {
+            Map<String, String> requestMap = new ObjectMapper().readValue(request.getInputStream(), Map.class);
+
+            String username = requestMap.get("username");
+            String password = requestMap.get("password");
+            String email = requestMap.get("email");
+
+            if(email != null)
+            {
+                com.mantarays.socialbackend.Models.User user = userService.loadUserByEmail(email);
+                username = user.getUsername();
+            }
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+            TokenUtility tokenUtility = new TokenUtility();
+            Map<String, String> tokens = tokenUtility.generateNewUserTokens(request, authenticationManager.authenticate(authenticationToken));
+            return ResponseEntity.ok().body(tokens);
+        }
+        catch(IOException e)
+        {
+            throw new AuthenticationServiceException(e.getMessage(), e);
+        }
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/token/refresh")
     public ResponseEntity<?> getNewToken(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
@@ -196,8 +232,8 @@ public class UserController
         {
             try
             {
-                TokenUtility tokenUtility = new TokenUtility(userService);
-                Map<String, String> tokens = tokenUtility.generateNewAccessTokenFromRefreshToken(request);
+                TokenUtility tokenUtility = new TokenUtility();
+                Map<String, String> tokens = tokenUtility.generateNewAccessTokenFromRefreshToken(request, userRepo);
 
                 response.setContentType("application/json");
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
