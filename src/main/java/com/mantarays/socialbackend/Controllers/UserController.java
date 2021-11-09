@@ -203,10 +203,12 @@ public class UserController
         if(multipartFile.getOriginalFilename() != null)
         {
             String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            user.setProfilePictureLink("/user-photos/" + user.getId() + "/" + fileName);
-            userRepo.save(user);
-            String uploadDir = "user-photos/" + user.getId();
+            String uploadDir = "user-photos/" + user.getId() + "/profile-pictures";
             PictureUploadingUtility.savePicture(uploadDir, fileName, multipartFile);
+
+            user.setProfilePictureLink("/user-photos/" + user.getId() + "/profile-pictures/" + fileName);
+            userRepo.save(user);
+
             return ResponseEntity.ok().body("Updated profile picture.");
         }
         return ResponseEntity.ok().body("Failed to update profile picture.");
