@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class User
     private String username;
 
     @NonNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NonNull
@@ -37,17 +40,21 @@ public class User
 
     private boolean logged_in;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password_reset_token;
 
     @NonNull
+    @JsonIgnore
     @OneToMany
     private List<Post> posts = new ArrayList<Post>();
 
     @NonNull
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<Role>();
 
     @NonNull
+    @JsonIgnore
     @ManyToMany
     private List<User> friends = new ArrayList<User>();
 }

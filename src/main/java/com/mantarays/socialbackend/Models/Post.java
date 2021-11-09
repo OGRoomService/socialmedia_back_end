@@ -34,7 +34,13 @@ public class Post
 
     private int likes;
 
+    @ElementCollection
+    private List<Long> usersThatLiked = new ArrayList<Long>();
+
     private int dislikes;
+
+    @ElementCollection
+    private List<Long> usersThatDisliked = new ArrayList<Long>();
 
     @NonNull
     @OneToMany

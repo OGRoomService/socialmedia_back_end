@@ -77,9 +77,21 @@ public class PostService implements PostServiceIntf
     }
 
     @Override
+    public void unlikePost(Post post)
+    {
+        post.setLikes(post.getLikes() - 1);
+    }
+
+    @Override
     public void dislikePost(Post post)
     {
         post.setDislikes(post.getDislikes() + 1);
+    }
+
+    @Override
+    public void undislikePost(Post post)
+    {
+        post.setDislikes(post.getDislikes() - 1);
     }
 
     @Override

@@ -52,6 +52,9 @@ public class UserController
     private UserVerification userVerification;
 
     @Autowired
+    private TokenUtility tokenUtility;
+
+    @Autowired
     private JavaMailSender emailSender;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -59,6 +62,25 @@ public class UserController
     public ResponseEntity<List<User>> getUsers()
     {
         return ResponseEntity.ok().body(userService.getUsers());
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/users/getself")
+    public ResponseEntity<?> getOwnUser(@RequestHeader("Authorization") String tokenHeader)
+    {
+        String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
+        return ResponseEntity.ok().body(userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken)));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/users/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token)
+    {
+        String accessToken = token.substring("Bearer ".length());
+        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+        user.setLogged_in(false);
+        userRepo.save(user);
+        return ResponseEntity.ok().body("Successfully logged out.");
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -196,19 +218,28 @@ public class UserController
         {
             Map<String, String> requestMap = new ObjectMapper().readValue(request.getInputStream(), Map.class);
 
+            User user = null;
+
             String username = requestMap.get("username");
             String password = requestMap.get("password");
             String email = requestMap.get("email");
 
             if(email != null)
             {
-                com.mantarays.socialbackend.Models.User user = userService.loadUserByEmail(email);
+                user = userService.loadUserByEmail(email);
                 username = user.getUsername();
             }
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             TokenUtility tokenUtility = new TokenUtility();
             Map<String, String> tokens = tokenUtility.generateNewUserTokens(request, authenticationManager.authenticate(authenticationToken));
+
+            if(user != null)
+            {
+                user.setLogged_in(true);
+                userRepo.save(user);
+            }
+
             return ResponseEntity.ok().body(tokens);
         }
         catch(IOException e)
