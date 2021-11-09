@@ -16,6 +16,7 @@ public interface UserServiceIntf
     void updatePassword(User user, String password);
     void updateUsername(User user, String username);
     void updateEmail(User user, String email);
+    void updateProfilePicture(User user, String linkToProfilePicture);
 
     //Role commands
     Role saveRole(Role role);

@@ -166,6 +166,13 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
+    public void updateProfilePicture(User user, String linkToProfilePicture)
+    {
+        user.setProfilePictureLink(linkToProfilePicture);
+        userRepo.save(user);
+    }
+
+    @Override
     public void updateUsername(User user, String username)
     {
         user.setUsername(username);

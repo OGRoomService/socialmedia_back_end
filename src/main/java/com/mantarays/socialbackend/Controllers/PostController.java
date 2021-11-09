@@ -16,7 +16,6 @@ import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.PostTextVerification;
 
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +35,6 @@ public class PostController
     private final UserRepository userRepository;
     private final PostTextVerification postTextVerification;
     private final TokenUtility tokenUtility;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     @PostMapping("/posts/create")
     public ResponseEntity<?> createPost(@RequestHeader("Authorization") String tokenHeader, @RequestBody Map<String, String> myMap)

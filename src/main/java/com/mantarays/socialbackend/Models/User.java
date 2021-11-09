@@ -28,6 +28,8 @@ public class User
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    private String profilePictureLink;
+
     @NonNull
     private String username;
 
