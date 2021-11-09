@@ -1,9 +1,14 @@
 package com.mantarays.socialbackend.Controllers;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mantarays.socialbackend.Forms.RoleToUserForm;
@@ -11,14 +16,16 @@ import com.mantarays.socialbackend.Forms.StandardReturnForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
-import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.Services.UserService;
+import com.mantarays.socialbackend.Utilities.PictureUploadingUtility;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -26,11 +33,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 
+import javax.activation.FileTypeMap;
+import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
@@ -74,9 +85,9 @@ public class UserController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token)
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String tokenHeader)
     {
-        String accessToken = token.substring("Bearer ".length());
+        String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
         User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
         user.setLogged_in(false);
         userRepo.save(user);
@@ -180,6 +191,47 @@ public class UserController
         userService.updatePassword(userService.getUser(myMap.get("username")), myMap.get("password"));
         return ResponseEntity.ok().body("Updated password.");
     }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("users/update_profile_picture")
+    public ResponseEntity<?> updateProfilePicture(@RequestHeader("Authorization") String tokenHeader,
+                                                  @RequestParam("image") MultipartFile multipartFile) throws IOException
+    {
+        String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
+        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+
+        if(multipartFile.getOriginalFilename() != null)
+        {
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            user.setProfilePictureLink("/user-photos/" + user.getId() + "/" + fileName);
+            userRepo.save(user);
+            String uploadDir = "user-photos/" + user.getId();
+            PictureUploadingUtility.savePicture(uploadDir, fileName, multipartFile);
+            return ResponseEntity.ok().body("Updated profile picture.");
+        }
+        return ResponseEntity.ok().body("Failed to update profile picture.");
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping(value = "users/get_profile_picture", produces= MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<?> getProfilePicture(@RequestHeader("Authorization") String tokenHeader) throws IOException
+    {
+        String token = tokenUtility.getTokenFromHeader(tokenHeader);
+        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(token));
+        if(user.getProfilePictureLink() != null)
+        {
+            String formattedDir = user.getProfilePictureLink().replace("/", "\\");
+            File img = new File(System.getProperty("user.dir") + formattedDir);
+            return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(FileTypeMap.getDefaultFileTypeMap().getContentType(img)))
+                .body(Files.readAllBytes(img.toPath()));
+        }
+        else
+        {
+            return ResponseEntity.badRequest().body("Failed to get user profile picture");
+        }
+    }
+
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/role/addtouser")

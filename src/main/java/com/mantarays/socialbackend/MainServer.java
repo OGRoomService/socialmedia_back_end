@@ -4,7 +4,6 @@ import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -74,11 +73,5 @@ public class MainServer
     TokenUtility tokenUtility()
     {
         return new TokenUtility();
-    }
-
-    @Bean
-    public ModelMapper modelMapper()
-    {
-        return new ModelMapper();
     }
 }
