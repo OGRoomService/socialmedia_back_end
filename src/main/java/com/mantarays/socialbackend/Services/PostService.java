@@ -97,7 +97,7 @@ public class PostService implements PostServiceIntf
     @Override
     public void commentPost(Post post, Comment comment)
     {
-        //post.getPost_comments().add(comment);
+        post.getPost_comments().add(comment);
     }
 
     @Override

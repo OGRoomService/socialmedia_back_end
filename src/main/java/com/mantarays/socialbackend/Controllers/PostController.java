@@ -10,6 +10,7 @@ import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.UserRepository;
+import com.mantarays.socialbackend.Services.CommentService;
 import com.mantarays.socialbackend.Services.PostService;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
@@ -32,6 +33,7 @@ public class PostController
 {
     private final PostService postService;
     private final UserService userService;
+    private final CommentService commentService;
     private final UserRepository userRepository;
     private final PostTextVerification postTextVerification;
     private final TokenUtility tokenUtility;
@@ -50,7 +52,7 @@ public class PostController
         return ResponseEntity.created(uri).body(post);
     }
 
-    @GetMapping("/posts/getposts")
+    @GetMapping("/posts/get_posts")
     public ResponseEntity<?> getPostsFromUser(@RequestBody Map<String, String> myMap)
     {
         if(myMap != null && myMap.containsKey("user_id"))
@@ -62,7 +64,7 @@ public class PostController
         return ResponseEntity.badRequest().body("user_id was null");
     }
 
-    @PostMapping("posts/likepost")
+    @PostMapping("posts/like_post")
     public ResponseEntity<?> likePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
     {
         if(myMap.containsKey("post_id"))
@@ -93,7 +95,7 @@ public class PostController
         return ResponseEntity.badRequest().body("post_id was not given.");
     }
 
-    @PostMapping("posts/dislikepost")
+    @PostMapping("posts/dislike_post")
     public ResponseEntity<?> dislikePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
     {
         if(myMap.containsKey("post_id"))
@@ -124,7 +126,7 @@ public class PostController
         return ResponseEntity.badRequest().body("post_id was not given.");
     }
 
-    @PostMapping("posts/savePost")
+    @PostMapping("posts/save_post")
     public ResponseEntity<?> savePost(Post post)
     {
         if(!postTextVerification.checkPostText(post.getPost_text()))
@@ -136,7 +138,23 @@ public class PostController
         return ResponseEntity.created(uri).body(postService.createPost(post));
     }
 
-    @PostMapping("posts/updatePostText")
+    @PostMapping("posts/comment_on_post")
+    public ResponseEntity<?> commentOnPost(@RequestHeader("Authorization") String tokenHeader,
+                                           @RequestBody Map<String, String> myMap)
+    {
+        User user = userRepository.findByUsername(tokenUtility.getUsernameFromToken(tokenUtility.getTokenFromHeader(tokenHeader)));
+        Post post = postService.getPost(Long.valueOf(myMap.get("post_id")));
+
+        Comment newComment = new Comment(user.getId(), myMap.get("comment_text"));
+        post.getPost_comments().add(newComment);
+
+        commentService.saveComment(newComment);
+        postService.savePost(post);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("posts/update_post_text")
     public ResponseEntity<?> updatePostText(Post post, String text)
     {
         if(!postTextVerification.checkPostText(text))
@@ -148,7 +166,7 @@ public class PostController
         return ResponseEntity.created(uri).build();
     }
 
-    @PostMapping("posts/deletePost")
+    @PostMapping("posts/delete_post")
     public ResponseEntity<?> deletePost(Post post)
     {
         postService.deletePost(post);

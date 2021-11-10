@@ -77,7 +77,7 @@ public class UserController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/users/getself")
+    @GetMapping("/users/get_self")
     public ResponseEntity<?> getOwnUser(@RequestHeader("Authorization") String tokenHeader)
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
@@ -147,7 +147,7 @@ public class UserController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/users/deleteAll")
+    @GetMapping("/users/delete_all")
     public ResponseEntity<?> deleteAll()
     {
         userService.deleteAll();
@@ -237,7 +237,7 @@ public class UserController
 
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("/role/addtouser")
+    @PostMapping("/role/add_to_user")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
     {
         userService.addRoleToUser(form.getUsername(), form.getRolename());

@@ -32,6 +32,8 @@ public class Post
     @NonNull
     private String post_text;
 
+    private String postPictureLink;
+
     private int likes;
 
     @ElementCollection
