@@ -298,7 +298,7 @@ public class UserController
         }
         catch(IOException e)
         {
-            throw new AuthenticationServiceException(e.getMessage(), e);
+            return ResponseEntity.badRequest().body("Unable to login with the given credentials.");
         }
     }
 
