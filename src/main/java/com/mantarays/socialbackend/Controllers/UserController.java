@@ -31,6 +31,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.StringUtils;
@@ -276,29 +277,34 @@ public class UserController
 
             String username = requestMap.get("username");
             String password = requestMap.get("password");
-            String email = requestMap.get("email");
 
-            if(email != null)
+            if(username.contains("@"))
             {
-                user = userService.loadUserByEmail(email);
+                user = userService.loadUserByEmail(username);
                 username = user.getUsername();
             }
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             TokenUtility tokenUtility = new TokenUtility();
-            Map<String, String> tokens = tokenUtility.generateNewUserTokens(request, authenticationManager.authenticate(authenticationToken));
-
-            if(user != null)
+            try
             {
-                user.setLogged_in(true);
-                userRepo.save(user);
-            }
+                Map<String, String> tokens = tokenUtility.generateNewUserTokens(request, authenticationManager.authenticate(authenticationToken));
+                if(user != null)
+                {
+                    user.setLogged_in(true);
+                    userRepo.save(user);
+                }
+                return ResponseEntity.ok().body(tokens);
 
-            return ResponseEntity.ok().body(tokens);
+            }
+            catch(BadCredentialsException e)
+            {
+                return ResponseEntity.badRequest().body("Unable to login with the given credentials.");
+            }
         }
         catch(IOException e)
         {
-            return ResponseEntity.badRequest().body("Unable to login with the given credentials.");
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
