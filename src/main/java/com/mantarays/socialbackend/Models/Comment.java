@@ -2,9 +2,7 @@ package com.mantarays.socialbackend.Models;
 
 import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.ArrayList;
@@ -14,22 +12,28 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class Comment
 {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long comment_id;
 
+    @NonNull
+    private Long commenter_id;
+
+    @NonNull
     private String comment_text;
 
     private int likes;
 
     private int dislikes;
 
-    @OneToMany
-    private List<Comment> comments = new ArrayList<Comment>();
+//    @OneToMany
+//    private List<Comment> comments = new ArrayList<Comment>();
 
+    @NonNull
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private Date comment_date;
+    private Date comment_date = new Date();
 }

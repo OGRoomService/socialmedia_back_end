@@ -63,8 +63,6 @@ public class TokenUtility
     {
         org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
 
-        System.out.println(authentication.getPrincipal());
-
         String accessToken = JWT.create()
             .withSubject(user.getUsername())
             .withExpiresAt(new Date(this.WEEK))
