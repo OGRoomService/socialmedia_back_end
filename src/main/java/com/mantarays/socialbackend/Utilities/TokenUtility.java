@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.UserRepository;
+import com.mantarays.socialbackend.Services.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,13 +38,13 @@ public class TokenUtility
         verifier = JWT.require(algorithm).build();
     }
 
-    public Map<String, String> generateNewAccessTokenFromRefreshToken(HttpServletRequest request, UserRepository userRepo)
+    public Map<String, String> generateNewAccessTokenFromRefreshToken(HttpServletRequest request, UserService userService)
     {
         String authorizationHeader = request.getHeader("Authorization");
         String refreshToken = authorizationHeader.substring("Bearer ".length());
         DecodedJWT decodedJWT = verifier.verify(refreshToken);
         String username = decodedJWT.getSubject();
-        User user = userRepo.findByUsername(username);
+        User user = userService.getUserFromUsername(username);
 
         String accessToken = JWT.create()
             .withSubject(user.getUsername())
@@ -96,10 +97,7 @@ public class TokenUtility
         String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
         Stream<String> stream = Arrays.stream(roles);
 
-        stream.forEach(role ->
-        {
-            authorities.add(new SimpleGrantedAuthority(role));
-        });
+        stream.forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
 
         return authorities;
     }

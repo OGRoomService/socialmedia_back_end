@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mantarays.socialbackend.Forms.StandardReturnForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Models.User;
-import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Utilities.EmailUtility;
 import com.mantarays.socialbackend.Utilities.PictureUploadingUtility;
@@ -24,8 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 
 import javax.activation.FileTypeMap;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,8 +50,6 @@ public class UserController
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepo;
-    private UserVerification userVerification;
 
     @Autowired
     private TokenUtility tokenUtility;
@@ -75,14 +69,14 @@ public class UserController
     public ResponseEntity<?> getOwnUser(@RequestHeader("Authorization") String tokenHeader)
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-        return ResponseEntity.ok().body(userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken)));
+        return ResponseEntity.ok().body(userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken)));
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/forgot_password")
     public ResponseEntity<?> forgotPassword(HttpServletRequest request, @RequestBody Map<String, String> myMap) throws UnsupportedEncodingException, MessagingException
     {
-        User user = userRepo.findByEmail(myMap.get("email"));
+        User user = userService.getUserFromEmail(myMap.get("email"));
         String passwordToken = RandomString.make(45);
         userService.updatePasswordResetToken(user, passwordToken);
 
@@ -95,7 +89,7 @@ public class UserController
     @PostMapping("/users/reset_password")
     public ResponseEntity<?> resetPassword(@RequestParam(value = "password_reset_token") String token)
     {
-        User user = userRepo.findByPasswordResetToken(token);
+        User user = userService.getUserFromPasswordResetToken(token);
         userService.updatePassword(user, "Password1234!");
         userService.updatePasswordResetToken(user, null);
 
@@ -107,7 +101,7 @@ public class UserController
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String tokenHeader)
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
         userService.updateLoggedIn(user, false);
         return ResponseEntity.ok().body("Successfully logged out.");
     }
@@ -118,7 +112,7 @@ public class UserController
     {
         UserFailureStringsForm failureStrings = new UserFailureStringsForm();
         StandardReturnForm returnForm = new StandardReturnForm();
-        userVerification = new UserVerification(userService, usernameVerification, passwordVerification, emailVerification);
+        UserVerification userVerification = new UserVerification(userService, usernameVerification, passwordVerification, emailVerification);
 
         if(!userVerification.doesAccountPassPreconditions(myMap, failureStrings))
         {
@@ -186,7 +180,7 @@ public class UserController
                                                   @RequestParam("image") MultipartFile multipartFile) throws IOException
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
 
         if(multipartFile.getOriginalFilename() != null)
         {
@@ -206,7 +200,7 @@ public class UserController
     public ResponseEntity<?> getProfilePicture(@RequestHeader("Authorization") String tokenHeader) throws IOException
     {
         String token = tokenUtility.getTokenFromHeader(tokenHeader);
-        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(token));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
         if(user.getProfilePictureLink() != null)
         {
             String formattedDir = user.getProfilePictureLink().replace("/", "\\");
@@ -227,16 +221,13 @@ public class UserController
                                        @RequestBody Map<String, String> myMap)
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
         if(myMap.containsKey("user_id"))
         {
-            Optional<User> otherUser = userRepo.findById(Long.parseLong(myMap.get("user_id")));
-            if (otherUser.isPresent())
-            {
-                userService.addUserToFriendsList(user, otherUser.get());
-                userService.addUserToFriendsList(otherUser.get(), user);
-                return ResponseEntity.ok().build();
-            }
+            User otherUser = userService.getUserFromID(myMap.get("user_id"));
+            userService.addUserToFriendsList(user, otherUser);
+            userService.addUserToFriendsList(otherUser, user);
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
@@ -247,16 +238,13 @@ public class UserController
                                        @RequestBody Map<String, String> myMap)
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
         if(myMap.containsKey("user_id"))
         {
-            Optional<User> otherUser = userRepo.findById(Long.parseLong(myMap.get("user_id")));
-            if (otherUser.isPresent())
-            {
-                userService.removeUserFromFriendsList(user, otherUser.get());
-                userService.removeUserFromFriendsList(otherUser.get(), user);
-                return ResponseEntity.ok().build();
-            }
+            User otherUser = userService.getUserFromID(myMap.get("user_id"));
+            userService.removeUserFromFriendsList(user, otherUser);
+            userService.removeUserFromFriendsList(otherUser, user);
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
@@ -315,7 +303,7 @@ public class UserController
             try
             {
                 TokenUtility tokenUtility = new TokenUtility();
-                Map<String, String> tokens = tokenUtility.generateNewAccessTokenFromRefreshToken(request, userRepo);
+                Map<String, String> tokens = tokenUtility.generateNewAccessTokenFromRefreshToken(request, userService);
 
                 response.setContentType("application/json");
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
