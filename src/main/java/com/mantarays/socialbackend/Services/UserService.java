@@ -39,11 +39,11 @@ public class UserService implements UserServiceIntf, UserDetailsService
         return userRepo.save(user);
     }
 
-    @Override
-    public void saveUser(User user)
-    {
-        userRepo.save(user);
-    }
+//    @Override
+//    public void saveUser(User user)
+//    {
+//        userRepo.save(user);
+//    }
 
     @Override
     public Role saveRole(Role role)
@@ -139,9 +139,23 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
+    public void updatePasswordResetToken(User user, String passwordResetToken)
+    {
+        user.setPasswordResetToken(passwordResetToken);
+        userRepo.save(user);
+    }
+
+    @Override
     public void updateProfilePicture(User user, String linkToProfilePicture)
     {
         user.setProfilePictureLink(linkToProfilePicture);
+        userRepo.save(user);
+    }
+
+    @Override
+    public void updateLoggedIn(User user, boolean loggedIn)
+    {
+        user.setLogged_in(loggedIn);
         userRepo.save(user);
     }
 

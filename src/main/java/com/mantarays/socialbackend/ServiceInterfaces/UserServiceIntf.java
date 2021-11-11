@@ -10,13 +10,15 @@ public interface UserServiceIntf
     //User commands
     User createUser(User user);
     User getUser(String username);
-    void saveUser(User user);
+    //void saveUser(User user);
 
     //Update commands
     void updatePassword(User user, String password);
     void updateUsername(User user, String username);
     void updateEmail(User user, String email);
+    void updatePasswordResetToken(User user, String passwordResetToken);
     void updateProfilePicture(User user, String linkToProfilePicture);
+    void updateLoggedIn(User user, boolean loggedIn);
 
     //Role commands
     Role saveRole(Role role);

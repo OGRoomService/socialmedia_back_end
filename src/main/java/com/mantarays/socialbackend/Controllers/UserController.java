@@ -84,9 +84,20 @@ public class UserController
     {
         User user = userRepo.findByEmail(myMap.get("email"));
         String passwordToken = RandomString.make(45);
-        user.setPassword_reset_token(passwordToken);
+        userService.updatePasswordResetToken(user, passwordToken);
 
         emailUtility.sendEmail("Password Reset Link", request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken, "lehquack@gmail.com");
+
+        return ResponseEntity.ok().build();
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/users/reset_password")
+    public ResponseEntity<?> resetPassword(@RequestParam(value = "password_reset_token") String token)
+    {
+        User user = userRepo.findByPasswordResetToken(token);
+        userService.updatePassword(user, "Password1234!");
+        userService.updatePasswordResetToken(user, null);
 
         return ResponseEntity.ok().build();
     }
@@ -97,8 +108,7 @@ public class UserController
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
         User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
-        user.setLogged_in(false);
-        userRepo.save(user);
+        userService.updateLoggedIn(user, false);
         return ResponseEntity.ok().body("Successfully logged out.");
     }
 
@@ -184,8 +194,7 @@ public class UserController
             String uploadDir = "user-photos/" + user.getId() + "/profile-pictures";
             PictureUploadingUtility.savePicture(uploadDir, fileName, multipartFile);
 
-            user.setProfilePictureLink("/user-photos/" + user.getId() + "/profile-pictures/" + fileName);
-            userRepo.save(user);
+            userService.updateProfilePicture(user, "/user-photos/" + user.getId() + "/profile-pictures/" + fileName);
 
             return ResponseEntity.ok().body("Updated profile picture.");
         }
@@ -224,10 +233,8 @@ public class UserController
             Optional<User> otherUser = userRepo.findById(Long.parseLong(myMap.get("user_id")));
             if (otherUser.isPresent())
             {
-                user.getFriends().add(otherUser.get());
-                otherUser.get().getFriends().add(user);
-                userRepo.save(user);
-                userRepo.save(otherUser.get());
+                userService.addUserToFriendsList(user, otherUser.get());
+                userService.addUserToFriendsList(otherUser.get(), user);
                 return ResponseEntity.ok().build();
             }
         }
@@ -246,10 +253,8 @@ public class UserController
             Optional<User> otherUser = userRepo.findById(Long.parseLong(myMap.get("user_id")));
             if (otherUser.isPresent())
             {
-                user.getFriends().remove(otherUser.get());
-                otherUser.get().getFriends().remove(user);
-                userRepo.save(user);
-                userRepo.save(otherUser.get());
+                userService.removeUserFromFriendsList(user, otherUser.get());
+                userService.removeUserFromFriendsList(otherUser.get(), user);
                 return ResponseEntity.ok().build();
             }
         }
@@ -283,8 +288,7 @@ public class UserController
                 Map<String, String> tokens = tokenUtility.generateNewUserTokens(request, authenticationManager.authenticate(authenticationToken));
                 if(user != null)
                 {
-                    user.setLogged_in(true);
-                    userRepo.save(user);
+                    userService.updateLoggedIn(user, true);
                 }
                 return ResponseEntity.ok().body(tokens);
 
