@@ -71,7 +71,6 @@ public class PostController
         List<User> friendsList = user.getFriends();
 
         long DAY_IN_MS = 1000 * 60 * 60 * 24;
-        int index = 0;
 
         List<Post> friendsListPosts = new ArrayList<Post>();
 
