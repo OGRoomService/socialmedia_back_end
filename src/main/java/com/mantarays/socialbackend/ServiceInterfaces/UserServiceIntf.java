@@ -10,6 +10,10 @@ public interface UserServiceIntf
     //User commands
     User createUser(User user);
     User getUser(String username);
+    User getUserFromID(String id);
+    User getUserFromEmail(String email);
+    User getUserFromUsername(String username);
+    User getUserFromPasswordResetToken(String passwordResetToken);
     //void saveUser(User user);
 
     //Update commands

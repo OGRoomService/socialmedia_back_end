@@ -67,6 +67,33 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
+    public User getUserFromID(String id)
+    {
+        if(userRepo.findById(Long.valueOf(id)).isPresent())
+            return userRepo.findById(Long.valueOf(id)).get();
+        else
+            return null;
+    }
+
+    @Override
+    public User getUserFromEmail(String email)
+    {
+        return userRepo.findByEmail(email);
+    }
+
+    @Override
+    public User getUserFromUsername(String username)
+    {
+        return userRepo.findByUsername(username);
+    }
+
+    @Override
+    public User getUserFromPasswordResetToken(String passwordResetToken)
+    {
+        return userRepo.findByPasswordResetToken(passwordResetToken);
+    }
+
+    @Override
     public List<User> getUsers()
     {
         return userRepo.findAll();
