@@ -26,7 +26,6 @@ public class PostService implements PostServiceIntf
     @Override
     public Post createPost(Post post)
     {
-        log.info("Adding post: {}, to database", post.getPost_id());
         return postRepo.save(post);
     }
 
@@ -42,7 +41,6 @@ public class PostService implements PostServiceIntf
         if(postRepo.existsById(post_id))
         {
             Post post = postRepo.getById(post_id);
-            log.info("Returning post: {}, to database", post.getPost_id());
             return post;
         }
         return null;
@@ -51,7 +49,6 @@ public class PostService implements PostServiceIntf
     @Override
     public Post savePost(Post post)
     {
-        log.info("Saving post: {}, to database", post.getPost_id());
         return postRepo.save(post);
     }
 

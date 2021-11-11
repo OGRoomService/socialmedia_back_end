@@ -22,6 +22,7 @@ import com.mantarays.socialbackend.Utilities.PictureUploadingUtility;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
+import net.bytebuddy.utility.RandomString;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -85,6 +86,18 @@ public class UserController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/users/forgot_password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> myMap)
+    {
+        User user = userRepo.findByEmail(myMap.get("email"));
+        String passwordToken = RandomString.make(45);
+
+        System.out.println(passwordToken);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String tokenHeader)
     {
@@ -122,28 +135,6 @@ public class UserController
             returnForm.message = "New user added to database.";
             return ResponseEntity.created(uri).body(returnForm);
         }
-    }
-
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("/users/save")
-    public ResponseEntity<?> saveUser(@RequestBody User user)
-    {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body("Saved user account");
-    }
-
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("/role/save")
-    public ResponseEntity<?> saveRole(@RequestBody Role role)
-    {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
-        StandardReturnForm returnForm = new StandardReturnForm();
-        if(userService.doesRoleExist(role.getName()))
-        {
-            returnForm.message = "Role already exists";
-            return ResponseEntity.badRequest().body(returnForm);
-        }
-        return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -233,15 +224,6 @@ public class UserController
         {
             return ResponseEntity.badRequest().body("Failed to get user profile picture");
         }
-    }
-
-
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("/role/add_to_user")
-    public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form)
-    {
-        userService.addRoleToUser(form.getUsername(), form.getRolename());
-        return ResponseEntity.ok().build();
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")

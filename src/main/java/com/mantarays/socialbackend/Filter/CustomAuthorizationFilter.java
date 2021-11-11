@@ -20,6 +20,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.mantarays.socialbackend.Utilities.TokenUtility;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +38,10 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
     {
         //This allows for these api calls to be called without tokens
-        if(request.getServletPath().equals("/api/users/login") || request.getServletPath().equals("/api/token/refresh"))
+        if(request.getServletPath().equals("/api/users/login") ||
+            request.getServletPath().equals("/api/token/refresh") ||
+            request.getServletPath().equals("/api/users/create") ||
+            request.getServletPath().equals("/api/users/forgot_password"))
         {
             filterChain.doFilter(request, response);
         }
@@ -60,7 +64,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter
             }
             else
             {
-                filterChain.doFilter(request, response);
+                response.sendError(403, "Access denied.");
             }
         }
     }
