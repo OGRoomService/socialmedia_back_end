@@ -19,7 +19,7 @@ public class CommentService implements CommentServiceIntf
     private final CommentRepository commentRepository;
 
     @Override
-    public void saveComment(Comment comment)
+    public void createComment(Comment comment)
     {
         commentRepository.save(comment);
     }

@@ -4,5 +4,5 @@ import com.mantarays.socialbackend.Models.Comment;
 
 public interface CommentServiceIntf
 {
-    void saveComment(Comment comment);
+    void createComment(Comment comment);
 }
