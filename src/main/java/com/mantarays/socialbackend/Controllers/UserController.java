@@ -245,6 +245,28 @@ public class UserController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/users/add_friend")
+    public ResponseEntity<?> addFriend(@RequestHeader("Authorization") String tokenHeader,
+                                       @RequestBody Map<String, String> myMap)
+    {
+        String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
+        User user = userRepo.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+        if(myMap.containsKey("user_id"))
+        {
+            Optional<User> otherUser = userRepo.findById(Long.parseLong(myMap.get("user_id")));
+            if (otherUser.isPresent())
+            {
+                user.getFriends().add(otherUser.get());
+                otherUser.get().getFriends().add(user);
+                userRepo.save(user);
+                userRepo.save(otherUser.get());
+                return ResponseEntity.ok().build();
+            }
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/sendemail")
     public ResponseEntity<?> sendEmail() throws UnsupportedEncodingException, MessagingException
     {

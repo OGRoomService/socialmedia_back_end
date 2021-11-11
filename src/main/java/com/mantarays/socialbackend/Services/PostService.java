@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -27,6 +29,12 @@ public class PostService implements PostServiceIntf
         log.info("Adding post: {}, to database", post.getPost_id());
         return postRepo.save(post);
     }
+
+    public List<Post> getAllPosts()
+    {
+        return postRepo.findAll();
+    }
+
 
     @Override
     public Post getPost(Long post_id)

@@ -55,11 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users/logout").permitAll();
 
 
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/create").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/posts/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("ROLE_USER");
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/getposts").hasAnyAuthority("ROLE_USER");
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/likepost").hasAnyAuthority("ROLE_USER");
-        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/posts/dislikepost").hasAnyAuthority("ROLE_USER");
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 

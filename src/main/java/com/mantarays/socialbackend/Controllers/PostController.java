@@ -1,11 +1,9 @@
 package com.mantarays.socialbackend.Controllers;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.User;
@@ -17,7 +15,8 @@ import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.PostTextVerification;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +51,8 @@ public class PostController
         return ResponseEntity.created(uri).body(post);
     }
 
-    @GetMapping("/posts/get_posts")
-    public ResponseEntity<?> getPostsFromUser(@RequestBody Map<String, String> myMap)
+    @GetMapping("/posts/get_posts_from_id")
+    public ResponseEntity<?> getPostsFromUserID(@RequestBody Map<String, String> myMap)
     {
         if(myMap != null && myMap.containsKey("user_id"))
         {
@@ -62,6 +61,43 @@ public class PostController
             return ResponseEntity.ok().body(user.getPosts());
         }
         return ResponseEntity.badRequest().body("user_id was null");
+    }
+
+    @GetMapping("/posts/get_posts_from_friends")
+    public ResponseEntity<?> getPostsFromFriends(@RequestHeader("Authorization") String tokenHeader)
+    {
+        String token = tokenUtility.getTokenFromHeader(tokenHeader);
+        User user = userRepository.findByUsername(tokenUtility.getUsernameFromToken(token));
+        List<User> friendsList = user.getFriends();
+
+        long DAY_IN_MS = 1000 * 60 * 60 * 24;
+        int index = 0;
+
+        List<Post> friendsListPosts = new ArrayList<Post>();
+
+        for(User friend : friendsList)
+        {
+            System.out.println("Grabbing all posts from: " + friend.getUsername());
+            for(Post post : friend.getPosts())
+            {
+                if(post.getPost_date().after(new Date(System.currentTimeMillis() - (7 * DAY_IN_MS))))
+                {
+                    if(friendsListPosts.size() < 15)
+                    {
+                        friendsListPosts.add(post);
+                    }
+                }
+            }
+        }
+        friendsListPosts.sort(Comparator.comparing(Post::getPost_date));
+        Collections.reverse(friendsListPosts);
+        return ResponseEntity.ok().body(friendsListPosts);
+    }
+
+    @GetMapping("/posts/get_posts")
+    public ResponseEntity<?> getPosts()
+    {
+        return ResponseEntity.badRequest().body(postService.getAllPosts());
     }
 
     @PostMapping("posts/like_post")
