@@ -1,12 +1,14 @@
 package com.mantarays.socialbackend;
 
 import com.mantarays.socialbackend.Repositories.UserRepository;
+import com.mantarays.socialbackend.Utilities.EmailUtility;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -73,5 +75,10 @@ public class MainServer
     TokenUtility tokenUtility()
     {
         return new TokenUtility();
+    }
+
+    @Bean EmailUtility emailUtility()
+    {
+        return new EmailUtility();
     }
 }
