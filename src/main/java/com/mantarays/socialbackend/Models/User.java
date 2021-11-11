@@ -46,8 +46,8 @@ public class User
     private String password_reset_token;
 
     @NonNull
-    @JsonIgnore
     @OneToMany
+    @JsonIgnore
     private List<Post> posts = new ArrayList<Post>();
 
     @NonNull
@@ -56,7 +56,7 @@ public class User
     private List<Role> roles = new ArrayList<Role>();
 
     @NonNull
-    @JsonIgnore
     @ManyToMany
+    @JsonIgnore
     private List<User> friends = new ArrayList<User>();
 }

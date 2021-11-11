@@ -2,12 +2,11 @@ package com.mantarays.socialbackend.Models;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Data
@@ -17,6 +16,7 @@ public class Comment
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private long comment_id;
 
     @NonNull
@@ -35,5 +35,6 @@ public class Comment
     @NonNull
     @CreatedDate
     @Column(nullable = false, updatable = false)
+    @JsonIgnore
     private Date comment_date = new Date();
 }
