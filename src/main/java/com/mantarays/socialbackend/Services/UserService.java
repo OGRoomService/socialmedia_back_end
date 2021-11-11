@@ -33,17 +33,11 @@ public class UserService implements UserServiceIntf, UserDetailsService
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User createUser(User user)
+    public void createUser(User user)
     {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepo.save(user);
+        userRepo.save(user);
     }
-
-//    @Override
-//    public void saveUser(User user)
-//    {
-//        userRepo.save(user);
-//    }
 
     @Override
     public Role saveRole(Role role)
@@ -118,7 +112,7 @@ public class UserService implements UserServiceIntf, UserDetailsService
     {
         try
         {
-            User user = loadUserByEmail(email);
+            User user = getUserFromEmail(email);
             return true;
         }
         catch(UsernameNotFoundException e)
@@ -138,24 +132,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
         {
             return false;
         }
-    }
-
-    public boolean doesRoleExist(String inrole)
-    {
-        Role role = roleRepo.findByName(inrole);
-        return role != null;
-    }
-
-    public User loadUserByEmail(String email) throws UsernameNotFoundException
-    {
-        User user = userRepo.findByEmail(email);
-        if(user == null)
-        {
-            String error = "User not found in database.";
-            log.error(error);
-            throw new UsernameNotFoundException(error);
-        }
-        return user;
     }
 
     @Override
