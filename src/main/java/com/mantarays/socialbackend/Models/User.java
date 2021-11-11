@@ -43,20 +43,20 @@ public class User
     private boolean logged_in;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password_reset_token;
+    private String passwordResetToken;
 
     @NonNull
     @OneToMany
     @JsonIgnore
-    private List<Post> posts = new ArrayList<Post>();
+    private List<Post> posts = new ArrayList<>();
 
     @NonNull
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles = new ArrayList<Role>();
+    private List<Role> roles = new ArrayList<>();
 
     @NonNull
     @ManyToMany
     @JsonIgnore
-    private List<User> friends = new ArrayList<User>();
+    private List<User> friends = new ArrayList<>();
 }
