@@ -26,7 +26,5 @@ public interface UserServiceIntf
     void addUserToFriendsList(User user, User newFriend);
     void removeUserFromFriendsList(User user, User oldFriend);
 
-    //TODO probably remove these...
     List<User> getUsers();
-    void deleteAll();
 }

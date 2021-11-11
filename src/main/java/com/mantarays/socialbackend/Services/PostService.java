@@ -40,8 +40,7 @@ public class PostService implements PostServiceIntf
     {
         if(postRepo.existsById(post_id))
         {
-            Post post = postRepo.getById(post_id);
-            return post;
+            return postRepo.getById(post_id);
         }
         return null;
     }
@@ -55,17 +54,6 @@ public class PostService implements PostServiceIntf
     @Override
     public Post sharePost(Post post, User user)
     {
-        /**
-         * TODO This will like need to take a Post type, and a User type
-         * then the user can call user.Addpost(Post) or something idk...
-         * We will be working on this much later...
-         *
-         * Putting in what i THINK would share them...
-         */
-        Post new_post = post;
-        new_post.setOriginal_poster_id(post.getPoster_id());
-        new_post.setPoster_id(user.getId());
-        postRepo.save(new_post);
         return null;
     }
 
