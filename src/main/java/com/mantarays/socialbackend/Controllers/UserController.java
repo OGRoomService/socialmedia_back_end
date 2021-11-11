@@ -265,7 +265,7 @@ public class UserController
 
             if(username.contains("@"))
             {
-                user = userService.loadUserByEmail(username);
+                user = userService.getUserFromEmail(username);
                 username = user.getUsername();
             }
 
