@@ -35,7 +35,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
     @Override
     public User createUser(User user)
     {
-        log.debug("Saving new user \"{}\" to database.", user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
@@ -43,14 +42,12 @@ public class UserService implements UserServiceIntf, UserDetailsService
     @Override
     public void saveUser(User user)
     {
-        log.debug("Saving user \"{}\" to database.", user.getUsername());
         userRepo.save(user);
     }
 
     @Override
     public Role saveRole(Role role)
     {
-        log.debug("Saving new role \"{}\" to database.", role.getName());
         return roleRepo.save(role);
     }
 
@@ -60,8 +57,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
         User user = userRepo.findByUsername(username);
         Role role = roleRepo.findByName(roleName);
 
-        log.debug("Saving new role \"{}\" to user \"{}\".", role.getName(), user.getUsername());
-
         user.getRoles().add(role);
     }
 
@@ -69,14 +64,12 @@ public class UserService implements UserServiceIntf, UserDetailsService
     public User getUser(String username)
     {
         User user = userRepo.findByUsername(username);
-        log.debug("Returning user \"{}\".", user.getUsername());
         return user;
     }
 
     @Override
     public List<User> getUsers()
     {
-        log.error("Returning all users. PLEASE DONT USE THIS");
         return userRepo.findAll();
     }
 
@@ -89,10 +82,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
             String error = "User not found in database.";
             log.error(error);
             throw new UsernameNotFoundException(error);
-        }
-        else
-        {
-            log.info("User {} found in database", username);
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role ->
@@ -144,10 +133,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
             String error = "User not found in database.";
             log.error(error);
             throw new UsernameNotFoundException(error);
-        }
-        else
-        {
-            log.info("User with email {} found in database", email);
         }
         return user;
     }
