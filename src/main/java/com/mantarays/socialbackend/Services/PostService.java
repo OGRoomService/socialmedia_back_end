@@ -34,7 +34,6 @@ public class PostService implements PostServiceIntf
         return postRepo.findAll();
     }
 
-
     @Override
     public Post getPost(Long post_id)
     {
@@ -61,36 +60,42 @@ public class PostService implements PostServiceIntf
     public void updatePostText(Post post, String comment)
     {
         post.setPost_text(comment);
+        postRepo.save(post);
     }
 
     @Override
     public void likePost(Post post)
     {
         post.setLikes(post.getLikes() + 1);
+        postRepo.save(post);
     }
 
     @Override
     public void unlikePost(Post post)
     {
         post.setLikes(post.getLikes() - 1);
+        postRepo.save(post);
     }
 
     @Override
     public void dislikePost(Post post)
     {
         post.setDislikes(post.getDislikes() + 1);
+        postRepo.save(post);
     }
 
     @Override
     public void undislikePost(Post post)
     {
         post.setDislikes(post.getDislikes() - 1);
+        postRepo.save(post);
     }
 
     @Override
     public void commentPost(Post post, Comment comment)
     {
         post.getPost_comments().add(comment);
+        postRepo.save(post);
     }
 
     @Override

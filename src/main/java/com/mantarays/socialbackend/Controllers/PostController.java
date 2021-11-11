@@ -3,11 +3,9 @@ package com.mantarays.socialbackend.Controllers;
 import java.net.URI;
 import java.util.*;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.User;
-import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.Services.CommentService;
 import com.mantarays.socialbackend.Services.PostService;
 import com.mantarays.socialbackend.Services.UserService;
@@ -15,8 +13,7 @@ import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.PostTextVerification;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +30,6 @@ public class PostController
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
-    private final UserRepository userRepository;
     private final PostTextVerification postTextVerification;
     private final TokenUtility tokenUtility;
 
@@ -42,7 +38,7 @@ public class PostController
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/createpost").toUriString());
-        User user = userRepository.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
         Post post = new Post(user.getId(), myMap.get("post_text"));
 
         post.setOriginal_poster_id(user.getId());
@@ -56,8 +52,7 @@ public class PostController
     {
         if(myMap != null && myMap.containsKey("user_id"))
         {
-            Long user_id = Long.valueOf(myMap.get("user_id"));
-            User user = userRepository.findById(user_id).get();
+            User user = userService.getUserFromID(myMap.get("user_id"));
             return ResponseEntity.ok().body(user.getPosts());
         }
         return ResponseEntity.badRequest().body("user_id was null");
@@ -67,12 +62,12 @@ public class PostController
     public ResponseEntity<?> getPostsFromFriends(@RequestHeader("Authorization") String tokenHeader)
     {
         String token = tokenUtility.getTokenFromHeader(tokenHeader);
-        User user = userRepository.findByUsername(tokenUtility.getUsernameFromToken(token));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
         List<User> friendsList = user.getFriends();
 
         long DAY_IN_MS = 1000 * 60 * 60 * 24;
 
-        List<Post> friendsListPosts = new ArrayList<Post>();
+        List<Post> friendsListPosts = new ArrayList<>();
 
         for(User friend : friendsList)
         {
@@ -105,7 +100,7 @@ public class PostController
         if(myMap.containsKey("post_id"))
         {
             String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-            User user = userRepository.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+            User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
 
             Long post_id = Long.valueOf(myMap.get("post_id"));
             Post post = postService.getPost(post_id);
@@ -136,7 +131,7 @@ public class PostController
         if(myMap.containsKey("post_id"))
         {
             String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-            User user = userRepository.findByUsername(tokenUtility.getUsernameFromToken(accessToken));
+            User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
 
             Long post_id = Long.valueOf(myMap.get("post_id"));
             Post post = postService.getPost(post_id);
@@ -161,30 +156,17 @@ public class PostController
         return ResponseEntity.badRequest().body("post_id was not given.");
     }
 
-    @PostMapping("posts/save_post")
-    public ResponseEntity<?> savePost(Post post)
-    {
-        if(!postTextVerification.checkPostText(post.getPost_text()))
-        {
-            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Post text length failed preconditions.");
-        }
-
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/savePost").toUriString());
-        return ResponseEntity.created(uri).body(postService.createPost(post));
-    }
-
     @PostMapping("posts/comment_on_post")
     public ResponseEntity<?> commentOnPost(@RequestHeader("Authorization") String tokenHeader,
                                            @RequestBody Map<String, String> myMap)
     {
-        User user = userRepository.findByUsername(tokenUtility.getUsernameFromToken(tokenUtility.getTokenFromHeader(tokenHeader)));
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(tokenUtility.getTokenFromHeader(tokenHeader)));
         Post post = postService.getPost(Long.valueOf(myMap.get("post_id")));
 
         Comment newComment = new Comment(user.getId(), myMap.get("comment_text"));
-        post.getPost_comments().add(newComment);
 
-        commentService.saveComment(newComment);
-        postService.savePost(post);
+        commentService.createComment(newComment);
+        postService.commentPost(post, newComment);
 
         return ResponseEntity.ok().build();
     }
