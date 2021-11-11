@@ -63,8 +63,7 @@ public class UserService implements UserServiceIntf, UserDetailsService
     @Override
     public User getUser(String username)
     {
-        User user = userRepo.findByUsername(username);
-        return user;
+        return userRepo.findByUsername(username);
     }
 
     @Override
@@ -84,10 +83,7 @@ public class UserService implements UserServiceIntf, UserDetailsService
             throw new UsernameNotFoundException(error);
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role ->
-        {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        });
+        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
@@ -120,9 +116,7 @@ public class UserService implements UserServiceIntf, UserDetailsService
     public boolean doesRoleExist(String inrole)
     {
         Role role = roleRepo.findByName(inrole);
-        if(role != null)
-            return true;
-        return false;
+        return role != null;
     }
 
     public User loadUserByEmail(String email) throws UsernameNotFoundException
@@ -135,12 +129,6 @@ public class UserService implements UserServiceIntf, UserDetailsService
             throw new UsernameNotFoundException(error);
         }
         return user;
-    }
-
-    @Override
-    public void deleteAll()
-    {
-        userRepo.deleteAll();
     }
 
     @Override

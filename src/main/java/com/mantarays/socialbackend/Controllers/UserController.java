@@ -80,14 +80,13 @@ public class UserController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/forgot_password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> myMap) throws UnsupportedEncodingException, MessagingException
+    public ResponseEntity<?> forgotPassword(HttpServletRequest request, @RequestBody Map<String, String> myMap) throws UnsupportedEncodingException, MessagingException
     {
         User user = userRepo.findByEmail(myMap.get("email"));
         String passwordToken = RandomString.make(45);
+        user.setPassword_reset_token(passwordToken);
 
-        emailUtility.sendEmail("Password Reset Link", "This hasnt been implemented yet. Sucks to suck i guess.", "lehquack@gmail.com");
-
-        System.out.println(passwordToken);
+        emailUtility.sendEmail("Password Reset Link", request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken, "lehquack@gmail.com");
 
         return ResponseEntity.ok().build();
     }
@@ -130,14 +129,6 @@ public class UserController
             returnForm.message = "New user added to database.";
             return ResponseEntity.created(uri).body(returnForm);
         }
-    }
-
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/users/delete_all")
-    public ResponseEntity<?> deleteAll()
-    {
-        userService.deleteAll();
-        return ResponseEntity.ok().body("Deleted all user accounts...");
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -271,6 +262,7 @@ public class UserController
     {
         try
         {
+            @SuppressWarnings("unchecked")
             Map<String, String> requestMap = new ObjectMapper().readValue(request.getInputStream(), Map.class);
 
             User user = null;
