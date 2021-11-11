@@ -1,9 +1,7 @@
 package com.mantarays.socialbackend.Controllers;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -11,19 +9,17 @@ import java.util.*;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mantarays.socialbackend.Forms.RoleToUserForm;
 import com.mantarays.socialbackend.Forms.StandardReturnForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
-import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.Services.UserService;
+import com.mantarays.socialbackend.Utilities.EmailUtility;
 import com.mantarays.socialbackend.Utilities.PictureUploadingUtility;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 import com.mantarays.socialbackend.VerificationServices.*;
 
 import net.bytebuddy.utility.RandomString;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +27,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -43,7 +38,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import lombok.RequiredArgsConstructor;
 
 import javax.activation.FileTypeMap;
-import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +53,6 @@ public class UserController
     private final UsernameVerification usernameVerification;
     private final PasswordVerification passwordVerification;
     private final EmailVerification emailVerification;
-    private final RecoveryQuestionVerification recoveryQuestionVerification;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepo;
     private UserVerification userVerification;
@@ -68,7 +61,7 @@ public class UserController
     private TokenUtility tokenUtility;
 
     @Autowired
-    private JavaMailSender emailSender;
+    private EmailUtility emailUtility;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users")
@@ -87,10 +80,12 @@ public class UserController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/forgot_password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> myMap)
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> myMap) throws UnsupportedEncodingException, MessagingException
     {
         User user = userRepo.findByEmail(myMap.get("email"));
         String passwordToken = RandomString.make(45);
+
+        emailUtility.sendEmail("Password Reset Link", "This hasnt been implemented yet. Sucks to suck i guess.", "lehquack@gmail.com");
 
         System.out.println(passwordToken);
 
@@ -268,27 +263,6 @@ public class UserController
             }
         }
         return ResponseEntity.badRequest().build();
-    }
-
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("/sendemail")
-    public ResponseEntity<?> sendEmail() throws UnsupportedEncodingException, MessagingException
-    {
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-
-        helper.setFrom("RowanSpaceSocial@gmail.com", "Rowanspace Support");
-        helper.setTo("Lehquack@gmail.com");
-
-        String subject = "Password reset link.";
-        String content = "<p> LETS GOOOOOOO </p>";
-
-        helper.setSubject(subject);
-        helper.setText(content, true);
-
-        emailSender.send(message);
-
-        return ResponseEntity.ok().build();
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
