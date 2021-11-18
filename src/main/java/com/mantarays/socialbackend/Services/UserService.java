@@ -179,12 +179,30 @@ public class UserService implements UserServiceIntf, UserDetailsService
     @Override
     public void addUserToFriendsList(User user, User newFriend)
     {
-        user.getFriends().add(newFriend);
+        if(user.getId() != newFriend.getId() && !(user.getFriends().contains(newFriend)))
+        {
+            user.getPotentialFriends().add(newFriend);
+
+            if(newFriend.getPotentialFriends().contains(user))
+            {
+                newFriend.getPotentialFriends().remove(user);
+                user.getPotentialFriends().remove(newFriend);
+                newFriend.getFriends().add(user);
+                user.getFriends().add(newFriend);
+            }
+        }
     }
 
     @Override
     public void removeUserFromFriendsList(User user, User oldFriend)
     {
         user.getFriends().remove(oldFriend);
+        oldFriend.getFriends().remove(user);
+    }
+
+    @Override
+    public List<User> getPotentialFriendsThatContain(User user)
+    {
+        return userRepo.findAllByPotentialFriendsContains(user);
     }
 }

@@ -30,6 +30,7 @@ public interface UserServiceIntf
     //Friendlist stuff
     void addUserToFriendsList(User user, User newFriend);
     void removeUserFromFriendsList(User user, User oldFriend);
+    List<User> getPotentialFriendsThatContain(User user);
 
     List<User> getUsers();
 }
