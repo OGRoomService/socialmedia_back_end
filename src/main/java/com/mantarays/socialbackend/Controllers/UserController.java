@@ -201,6 +201,11 @@ public class UserController
     {
         String token = tokenUtility.getTokenFromHeader(tokenHeader);
         User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
+        if(user == null)
+        {
+            return ResponseEntity.badRequest().body("Failed to get user");
+        }
+
         if(user.getProfilePictureLink() != null)
         {
             String formattedDir = user.getProfilePictureLink().replace("/", "\\");
