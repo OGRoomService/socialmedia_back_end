@@ -74,51 +74,75 @@ public class UserController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/forgot_password")
-    public ResponseEntity<?> forgotPassword(HttpServletRequest request, @RequestBody Map<String, String> myMap) throws UnsupportedEncodingException, MessagingException
+    public ResponseEntity<?> forgotPassword(HttpServletRequest request, @RequestBody Optional<Map<String, String>> myMap) throws UnsupportedEncodingException, MessagingException
     {
-        User user = userService.getUserFromEmail(myMap.get("email"));
-        String passwordToken = RandomString.make(45);
         StandardReturnForm form = new StandardReturnForm();
+        if(myMap.isPresent())
+        {
+            Map<String, String> verifiedMap = myMap.get();
+            if(!verifiedMap.containsKey("email"))
+            {
+                form.message = "No email given.";
+                return ResponseEntity.badRequest().body(form);
+            }
 
-        userService.updatePasswordResetToken(user, passwordToken);
-        emailUtility.sendEmail( "Password Reset Link",
-                                request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken,
-                                "lehquack@gmail.com");
-        form.message = "Password reset link sent.";
+            User user = userService.getUserFromEmail(verifiedMap.get("email"));
+            String passwordToken = RandomString.make(45);
 
-        return ResponseEntity.ok().body(form);
+            userService.updatePasswordResetToken(user, passwordToken);
+            emailUtility.sendEmail( "Password Reset Link",
+                request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken,
+                "lehquack@gmail.com");
+
+            form.message = "Password reset link sent.";
+
+            return ResponseEntity.ok().body(form);
+        }
+        else
+        {
+            form.message = "No data given.";
+            return ResponseEntity.badRequest().body(form);
+        }
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/reset_password")
-    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> myMap)
+    public ResponseEntity<?> resetPassword(@RequestBody Optional<Map<String, String>> myMap)
     {
         StandardReturnForm form = new StandardReturnForm();
-
-        if(myMap.get("password_reset_token") == null)
+        if(myMap.isPresent())
         {
-            form.message = "No password reset token given.";
+            Map<String, String> verifiedMap = myMap.get();
+            if(!verifiedMap.containsKey("password_reset_token"))
+            {
+                form.message = "No password reset token given.";
+                return ResponseEntity.badRequest().body(form);
+            }
+
+            User user = userService.getUserFromPasswordResetToken(verifiedMap.get("password_reset_token"));
+
+            if(user == null)
+            {
+                form.message = "Cannot find a user with the given password reset token.";
+                return ResponseEntity.badRequest().body(form);
+            }
+
+            if(!verifiedMap.containsKey("new_password"))
+            {
+                form.message = "No new password given.";
+                return ResponseEntity.badRequest().body(form);
+            }
+
+            userService.updatePassword(user, verifiedMap.get("new_password"));
+            userService.updatePasswordResetToken(user, null);
+
+            return ResponseEntity.ok().build();
+        }
+        else
+        {
+            form.message = "No data given.";
             return ResponseEntity.badRequest().body(form);
         }
-
-        User user = userService.getUserFromPasswordResetToken(myMap.get("password_reset_token"));
-
-        if(user == null)
-        {
-            form.message = "Cannot find a user with the given password reset token.";
-            return ResponseEntity.badRequest().body(form);
-        }
-
-        if(myMap.get("new_password") == null)
-        {
-            form.message = "No new password given.";
-            return ResponseEntity.badRequest().body(form);
-        }
-
-        userService.updatePassword(user, myMap.get("new_password"));
-        userService.updatePasswordResetToken(user, null);
-
-        return ResponseEntity.ok().build();
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
