@@ -266,6 +266,41 @@ public class UserController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @PostMapping("/users/decline_friend")
+    public ResponseEntity<?> declineFriend( @RequestHeader("Authorization") String tokenHeader,
+                                            @RequestBody Map<String, String> myMap)
+    {
+        String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
+        if(user == null)
+        {
+            return ResponseEntity.badRequest().body("Failed to get user");
+        }
+
+        if(myMap.containsKey("user_id"))
+        {
+            User otherUser = userService.getUserFromID(myMap.get("user_id"));
+
+            if(otherUser == null)
+            {
+                return ResponseEntity.badRequest().body("Failed to get other user");
+            }
+
+            if(otherUser.getPotentialFriends().contains(user))
+            {
+                userService.removeFromPotentialFriends(otherUser, user);
+                System.out.println("Removing " + otherUser + " from " + user);
+                return ResponseEntity.ok().build();
+            }
+            else
+            {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/delete_friend")
     public ResponseEntity<?> deleteFriend(@RequestHeader("Authorization") String tokenHeader,
                                        @RequestBody Map<String, String> myMap)
