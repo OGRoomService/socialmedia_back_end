@@ -78,19 +78,44 @@ public class UserController
     {
         User user = userService.getUserFromEmail(myMap.get("email"));
         String passwordToken = RandomString.make(45);
+        StandardReturnForm form = new StandardReturnForm();
+
         userService.updatePasswordResetToken(user, passwordToken);
+        emailUtility.sendEmail( "Password Reset Link",
+                                request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken,
+                                "lehquack@gmail.com");
+        form.message = "Password reset link sent.";
 
-        emailUtility.sendEmail("Password Reset Link", request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken, "lehquack@gmail.com");
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(form);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/users/reset_password")
-    public ResponseEntity<?> resetPassword(@RequestParam(value = "password_reset_token") String token)
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> myMap)
     {
-        User user = userService.getUserFromPasswordResetToken(token);
-        userService.updatePassword(user, "Password1234!");
+        StandardReturnForm form = new StandardReturnForm();
+
+        if(myMap.get("password_reset_token") == null)
+        {
+            form.message = "No password reset token given.";
+            return ResponseEntity.badRequest().body(form);
+        }
+
+        User user = userService.getUserFromPasswordResetToken(myMap.get("password_reset_token"));
+
+        if(user == null)
+        {
+            form.message = "Cannot find a user with the given password reset token.";
+            return ResponseEntity.badRequest().body(form);
+        }
+
+        if(myMap.get("new_password") == null)
+        {
+            form.message = "No new password given.";
+            return ResponseEntity.badRequest().body(form);
+        }
+
+        userService.updatePassword(user, myMap.get("new_password"));
         userService.updatePasswordResetToken(user, null);
 
         return ResponseEntity.ok().build();
