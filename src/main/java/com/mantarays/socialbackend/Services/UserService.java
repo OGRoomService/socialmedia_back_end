@@ -113,7 +113,7 @@ public class UserService implements UserServiceIntf, UserDetailsService
         try
         {
             User user = getUserFromEmail(email);
-            return true;
+            return user != null;
         }
         catch(UsernameNotFoundException e)
         {
