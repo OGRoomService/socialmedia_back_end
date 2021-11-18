@@ -59,4 +59,14 @@ public class User
     @ManyToMany
     @JsonIgnore
     private List<User> friends = new ArrayList<>();
+
+    @NonNull
+    @ManyToMany
+    @JsonIgnore
+    private List<User> potentialFriends = new ArrayList<>();
+
+    public String toString()
+    {
+        return username;
+    }
 }

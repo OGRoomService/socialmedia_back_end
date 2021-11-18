@@ -175,12 +175,30 @@ public class UserController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("users/get_potential_friends")
+    public ResponseEntity<?> getPotentialFriends(@RequestHeader("Authorization") String tokenHeader)
+    {
+        String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
+        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
+        if(user == null)
+        {
+            return ResponseEntity.badRequest().body("Failed to get user");
+        }
+
+        return ResponseEntity.ok().body(userService.getPotentialFriendsThatContain(user));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("users/update_profile_picture")
     public ResponseEntity<?> updateProfilePicture(@RequestHeader("Authorization") String tokenHeader,
                                                   @RequestParam("image") MultipartFile multipartFile) throws IOException
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
         User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
+        if(user == null)
+        {
+            return ResponseEntity.badRequest().body("Failed to get user");
+        }
 
         if(multipartFile.getOriginalFilename() != null)
         {
@@ -227,11 +245,21 @@ public class UserController
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
         User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
+        if(user == null)
+        {
+            return ResponseEntity.badRequest().body("Failed to get user");
+        }
         if(myMap.containsKey("user_id"))
         {
             User otherUser = userService.getUserFromID(myMap.get("user_id"));
+
+            if(otherUser == null)
+            {
+                return ResponseEntity.badRequest().body("Failed to get other user");
+            }
+
             userService.addUserToFriendsList(user, otherUser);
-            userService.addUserToFriendsList(otherUser, user);
+
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
@@ -244,6 +272,11 @@ public class UserController
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
         User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
+        if(user == null)
+        {
+            return ResponseEntity.badRequest().body("Failed to get user");
+        }
+
         if(myMap.containsKey("user_id"))
         {
             User otherUser = userService.getUserFromID(myMap.get("user_id"));
