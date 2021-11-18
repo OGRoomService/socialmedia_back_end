@@ -31,6 +31,7 @@ public interface UserServiceIntf
     void addUserToFriendsList(User user, User newFriend);
     void removeUserFromFriendsList(User user, User oldFriend);
     List<User> getPotentialFriendsThatContain(User user);
+    void removeFromPotentialFriends(User otherUser, User user);
 
     List<User> getUsers();
 }

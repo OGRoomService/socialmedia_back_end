@@ -205,4 +205,11 @@ public class UserService implements UserServiceIntf, UserDetailsService
     {
         return userRepo.findAllByPotentialFriendsContains(user);
     }
+
+    @Override
+    public void removeFromPotentialFriends(User otherUser, User user)
+    {
+        otherUser.getPotentialFriends().remove(user);
+        userRepo.save(user);
+    }
 }
