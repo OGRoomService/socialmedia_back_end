@@ -399,6 +399,7 @@ public class UserController
                 if(user != null)
                 {
                     userService.updateLoggedIn(user, true);
+                    userService.updatePasswordResetToken(user, null);
                 }
                 return ResponseEntity.ok().body(tokens);
 
