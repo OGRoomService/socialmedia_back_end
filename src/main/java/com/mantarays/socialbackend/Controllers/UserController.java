@@ -79,24 +79,24 @@ public class UserController
         StandardReturnForm form = new StandardReturnForm();
         if(myMap.isPresent())
         {
-            Map<String, String> verifiedMap = myMap.get();
-            if(!verifiedMap.containsKey("email"))
-            {
-                form.message = "No email given.";
+            try {
+                Map<String, String> verifiedMap = myMap.get();
+
+                User user = userService.getUserFromEmail(verifiedMap.get("email"));
+                String passwordToken = RandomString.make(45);
+
+                userService.updatePasswordResetToken(user, passwordToken);
+                emailUtility.sendEmail( "Password Reset Link",
+                    request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken,
+                    user.getEmail());
+
+                form.message = "Password reset link sent.";
+
+                return ResponseEntity.ok().body(form);
+            } catch (Exception e) {
+                form.message = "Error With Request";
                 return ResponseEntity.badRequest().body(form);
             }
-
-            User user = userService.getUserFromEmail(verifiedMap.get("email"));
-            String passwordToken = RandomString.make(45);
-
-            userService.updatePasswordResetToken(user, passwordToken);
-            emailUtility.sendEmail( "Password Reset Link",
-                request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken,
-                "lehquack@gmail.com");
-
-            form.message = "Password reset link sent.";
-
-            return ResponseEntity.ok().body(form);
         }
         else
         {

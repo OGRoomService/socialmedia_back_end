@@ -28,8 +28,8 @@ public class EmailUtility
         helper.setSubject(subject);
         helper.setText(content, true);
 
-        FileSystemResource file = new FileSystemResource(new File(System.getProperty("user.dir") + "\\user-photos\\sadge.png"));
-        helper.addInline("sadge_picture", file);
+        //FileSystemResource file = new FileSystemResource(new File(System.getProperty("user.dir") + "\\user-photos\\sadge.png"));
+        //helper.addInline("sadge_picture", file);
 
         emailSender.send(message);
     }
