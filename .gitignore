@@ -34,3 +34,4 @@ build/
 
 ### Profile Pictures ###
 /user-photos/
+src/main/resources/application.properties
