@@ -33,6 +33,7 @@ public class PostController
     private final PostTextVerification postTextVerification;
     private final TokenUtility tokenUtility;
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/posts/create")
     public ResponseEntity<?> createPost(@RequestHeader("Authorization") String tokenHeader, @RequestBody Map<String, String> myMap)
     {
@@ -47,6 +48,7 @@ public class PostController
         return ResponseEntity.created(uri).body(post);
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/posts/get_posts_from_id")
     public ResponseEntity<?> getPostsFromUserID(@RequestBody Map<String, String> myMap)
     {
@@ -58,6 +60,7 @@ public class PostController
         return ResponseEntity.badRequest().body("user_id was null");
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/posts/get_posts_from_friends")
     public ResponseEntity<?> getPostsFromFriends(@RequestHeader("Authorization") String tokenHeader)
     {
@@ -88,12 +91,14 @@ public class PostController
         return ResponseEntity.ok().body(friendsListPosts);
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/posts/get_posts")
     public ResponseEntity<?> getPosts()
     {
         return ResponseEntity.badRequest().body(postService.getAllPosts());
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("posts/like_post")
     public ResponseEntity<?> likePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
     {
@@ -125,6 +130,7 @@ public class PostController
         return ResponseEntity.badRequest().body("post_id was not given.");
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("posts/dislike_post")
     public ResponseEntity<?> dislikePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
     {
@@ -156,6 +162,7 @@ public class PostController
         return ResponseEntity.badRequest().body("post_id was not given.");
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("posts/comment_on_post")
     public ResponseEntity<?> commentOnPost(@RequestHeader("Authorization") String tokenHeader,
                                            @RequestBody Map<String, String> myMap)
@@ -171,6 +178,7 @@ public class PostController
         return ResponseEntity.ok().build();
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("posts/update_post_text")
     public ResponseEntity<?> updatePostText(Post post, String text)
     {
@@ -183,6 +191,7 @@ public class PostController
         return ResponseEntity.created(uri).build();
     }
 
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("posts/delete_post")
     public ResponseEntity<?> deletePost(Post post)
     {
