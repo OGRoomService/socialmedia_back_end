@@ -87,7 +87,7 @@ public class UserController
 
                 userService.updatePasswordResetToken(user, passwordToken);
                 emailUtility.sendEmail( "Password Reset Link",
-                    request.getRequestURL().toString() + "/reset_password_token?token=" + passwordToken,
+                    "http://rowanspace.xyz/reset_password?token=" + passwordToken,
                     user.getEmail());
 
                 form.message = "Password reset link sent.";
