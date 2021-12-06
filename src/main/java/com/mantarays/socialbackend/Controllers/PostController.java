@@ -95,7 +95,7 @@ public class PostController
     @GetMapping("/posts/get_posts")
     public ResponseEntity<?> getPosts()
     {
-        return ResponseEntity.badRequest().body(postService.getAllPosts());
+        return ResponseEntity.ok().body(postService.getAllPosts());
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -112,18 +112,23 @@ public class PostController
 
             if(post != null)
             {
+                Map<String, String> response = new HashMap<String, String>();
+
                 if(post.getUsersThatLiked().contains(user.getId()))
                 {
                     post.getUsersThatLiked().remove(user.getId());
+                    response.put("liked", "" + false);
                     postService.unlikePost(post);
-                    return ResponseEntity.ok().body("Removed like from post.");
                 }
                 else
                 {
                     post.getUsersThatLiked().add(user.getId());
+                    response.put("liked", "" + true);
                     postService.likePost(post);
-                    return ResponseEntity.ok().body("Added like to post.");
                 }
+
+                response.put("likes", "" + post.getUsersThatLiked().size());
+                return ResponseEntity.ok().body(response);
             }
             return ResponseEntity.badRequest().body("No post with such ID");
         }
