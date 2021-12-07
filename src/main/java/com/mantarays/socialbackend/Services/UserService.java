@@ -63,10 +63,13 @@ public class UserService implements UserServiceIntf, UserDetailsService
     @Override
     public User getUserFromID(String id)
     {
-        if(userRepo.findById(Long.valueOf(id)).isPresent())
-            return userRepo.findById(Long.valueOf(id)).get();
-        else
+        try {
+            Long userId = Long.parseLong(id);
+            
+            return userRepo.findById(userId).get();
+        } catch (Exception e) {
             return null;
+        }
     }
 
     @Override

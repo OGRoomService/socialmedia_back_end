@@ -8,6 +8,7 @@ public interface PostServiceIntf
 {
     Post createPost(Post post);
     Post getPost(Long post_id);
+    Post getPostById(String id);
     Post savePost(Post post);
     Post sharePost(Post post, User user);
 
@@ -18,5 +19,6 @@ public interface PostServiceIntf
     void dislikePost(Post post);
     void undislikePost(Post post);
     void commentPost(Post post, Comment comment);
-    void deletePost(Post post);
+    boolean deletePost(Post post);
+    boolean deletePostById(String id);
 }

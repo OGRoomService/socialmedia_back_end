@@ -22,7 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 @Slf4j
 public class PostController
@@ -34,7 +34,7 @@ public class PostController
     private final TokenUtility tokenUtility;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("/posts/create")
+    @PostMapping("/create")
     public ResponseEntity<?> createPost(@RequestHeader("Authorization") String tokenHeader, @RequestBody Map<String, String> myMap)
     {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
@@ -49,19 +49,22 @@ public class PostController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/posts/get_posts_from_id")
+    @PostMapping("/get_posts_from_id")
     public ResponseEntity<?> getPostsFromUserID(@RequestBody Map<String, String> myMap)
     {
         if(myMap != null && myMap.containsKey("user_id"))
         {
             User user = userService.getUserFromID(myMap.get("user_id"));
-            return ResponseEntity.ok().body(user.getPosts());
+            List<Post> posts = user.getPosts();
+
+            posts.sort(Comparator.comparing(Post::getPost_date).reversed());
+            return ResponseEntity.ok().body(posts);
         }
         return ResponseEntity.badRequest().body("user_id was null");
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/posts/get_posts_from_friends")
+    @GetMapping("/get_posts_from_friends")
     public ResponseEntity<?> getPostsFromFriends(@RequestHeader("Authorization") String tokenHeader)
     {
         String token = tokenUtility.getTokenFromHeader(tokenHeader);
@@ -86,20 +89,22 @@ public class PostController
                 }
             }
         }
-        friendsListPosts.sort(Comparator.comparing(Post::getPost_date));
-        Collections.reverse(friendsListPosts);
+        friendsListPosts.sort(Comparator.comparing(Post::getPost_date).reversed());
         return ResponseEntity.ok().body(friendsListPosts);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/posts/get_posts")
+    @GetMapping("/get_posts")
     public ResponseEntity<?> getPosts()
     {
-        return ResponseEntity.ok().body(postService.getAllPosts());
+        List<Post> posts = postService.getAllPosts();
+        
+        posts.sort(Comparator.comparing(Post::getPost_date).reversed());
+        return ResponseEntity.ok().body(posts);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("posts/like_post")
+    @PostMapping("/like_post")
     public ResponseEntity<?> likePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
     {
         if(myMap.containsKey("post_id"))
@@ -136,7 +141,7 @@ public class PostController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("posts/dislike_post")
+    @PostMapping("/dislike_post")
     public ResponseEntity<?> dislikePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
     {
         if(myMap.containsKey("post_id"))
@@ -168,23 +173,26 @@ public class PostController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("posts/comment_on_post")
+    @PostMapping("/comment_on_post")
     public ResponseEntity<?> commentOnPost(@RequestHeader("Authorization") String tokenHeader,
                                            @RequestBody Map<String, String> myMap)
     {
-        User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(tokenUtility.getTokenFromHeader(tokenHeader)));
-        Post post = postService.getPost(Long.valueOf(myMap.get("post_id")));
-
-        Comment newComment = new Comment(user.getId(), myMap.get("comment_text"));
-
-        commentService.createComment(newComment);
-        postService.commentPost(post, newComment);
-
-        return ResponseEntity.ok().build();
+        try {
+            User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(tokenUtility.getTokenFromHeader(tokenHeader)));
+            Post post = postService.getPost(Long.valueOf(myMap.get("post_id")));
+            Comment newComment = new Comment(user.getId(), myMap.get("comment_text"));
+    
+            commentService.createComment(newComment);
+            postService.commentPost(post, newComment);
+    
+            return ResponseEntity.ok().body(newComment);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Query Failed");
+        }
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("posts/update_post_text")
+    @PostMapping("/update_post_text")
     public ResponseEntity<?> updatePostText(Post post, String text)
     {
         if(!postTextVerification.checkPostText(text))
@@ -197,11 +205,24 @@ public class PostController
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("posts/delete_post")
-    public ResponseEntity<?> deletePost(Post post)
-    {
-        postService.deletePost(post);
-        return ResponseEntity.accepted().build();
-    }
+    @PostMapping("/delete_post")
+    public ResponseEntity<?> deletePost(@RequestHeader("Authorization") String tokenHeader,
+            @RequestBody Map<String, String> myMap) {
+        try {
+            String token = tokenUtility.getTokenFromHeader(tokenHeader);
+            User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
+            Post post = postService.getPostById(myMap.get("post_id"));
+            Map<String, String> response = new HashMap<String, String>();
 
+            /* if (comment.getCommenter_id() != user.getId()) 
+                return ResponseEntity.badRequest().body("Query failed"); */
+            
+            boolean succeed = postService.deletePost(post);
+
+            response.put("deleted", "" + succeed);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Query Failed");
+        }
+    }
 }

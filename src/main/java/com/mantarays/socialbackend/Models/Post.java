@@ -46,7 +46,7 @@ public class Post
     private List<Long> usersThatDisliked = new ArrayList<Long>();
 
     @NonNull
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> post_comments = new ArrayList<Comment>();
 
     @NonNull

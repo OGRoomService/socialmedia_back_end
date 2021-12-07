@@ -6,7 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -16,7 +19,6 @@ public class Comment
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonIgnore
     private long comment_id;
 
     @NonNull
@@ -26,6 +28,9 @@ public class Comment
     private String comment_text;
 
     private int likes;
+
+    @ElementCollection
+    private List<Long> usersThatLiked = new ArrayList<Long>();
 
     private int dislikes;
 
