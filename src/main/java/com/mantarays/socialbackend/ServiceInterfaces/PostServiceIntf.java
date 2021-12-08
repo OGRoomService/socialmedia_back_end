@@ -6,6 +6,8 @@ import com.mantarays.socialbackend.Models.User;
 
 public interface PostServiceIntf
 {
+    boolean deleteComment(Post post, Comment comment);
+
     Post createPost(Post post);
     Post getPost(Long post_id);
     Post getPostById(String id);

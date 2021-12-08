@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mantarays.socialbackend.Models.Comment;
+import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Services.CommentService;
+import com.mantarays.socialbackend.Services.PostService;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Utilities.TokenUtility;
 
@@ -22,16 +24,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/comments")
 @RequiredArgsConstructor
 @Slf4j
 public class CommentController {
     private final UserService userService;
     private final CommentService commentService;
+    private final PostService postService;
     private final TokenUtility tokenUtility;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("comments/like_comment")
+    @PostMapping("/like_comment")
     public ResponseEntity<?> likeComment(@RequestHeader("Authorization") String tokenHeader,
             @RequestBody Map<String, String> myMap) {
         try {
@@ -42,12 +45,12 @@ public class CommentController {
 
             if (comment.getUsersThatLiked().contains(user.getId())) {
                 comment.getUsersThatLiked().remove(user.getId());
-                response.put("liked", "" + true);
-                commentService.likeComment(comment);
+                response.put("liked", "" + false);
+                commentService.unlikeComment(comment);
             } else {
                 comment.getUsersThatLiked().add(user.getId());
                 response.put("liked", "" + true);
-                commentService.unlikeComment(comment);
+                commentService.likeComment(comment);
             }
             response.put("likes", "" + comment.getUsersThatLiked().size());
             return ResponseEntity.ok().body(response);
@@ -57,24 +60,31 @@ public class CommentController {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PostMapping("comments/delete_comment")
+    @PostMapping("/delete_comment")
     public ResponseEntity<?> deleteComment(@RequestHeader("Authorization") String tokenHeader,
             @RequestBody Map<String, String> myMap) {
         try {
             String token = tokenUtility.getTokenFromHeader(tokenHeader);
             User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
             Comment comment = commentService.getCommentById(myMap.get("comment_id"));
+            Post post = postService.getPostById(myMap.get("post_id"));
             Map<String, String> response = new HashMap<String, String>();
 
-            /* if (comment.getCommenter_id() != user.getId()) 
-                return ResponseEntity.badRequest().body("Query failed"); */
-            
-            boolean succeed = commentService.deleteCommentById(myMap.get("comment_id"));
-
-            response.put("deleted", "" + succeed);
+            if (comment.getCommenter_id() != user.getId()) {
+                throw new Exception();
+            }
+            if (postService.deleteComment(post, comment) &&
+                    commentService.deleteComment(comment)) {
+                response.put("failed", "false");
+            } else {
+                response.put("failed", "true");
+            }
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Query Failed");
+            Map<String, String> response = new HashMap<String, String>();
+
+            response.put("failed", "true");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 }

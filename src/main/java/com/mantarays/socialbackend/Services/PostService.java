@@ -23,6 +23,17 @@ public class PostService implements PostServiceIntf {
     private final PostRepository postRepo;
 
     @Override
+    public boolean deleteComment(Post post, Comment comment) {
+        try {
+            post.getPost_comments().remove(comment);
+            postRepo.save(post);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
     public Post createPost(Post post) {
         return postRepo.save(post);
     }

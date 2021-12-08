@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
@@ -31,6 +32,17 @@ public class UserService implements UserServiceIntf, UserDetailsService
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public boolean deletePost(User user, Post post) {
+        try {
+            user.getPosts().remove(post);
+            userRepo.save(user);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     @Override
     public void createUser(User user)

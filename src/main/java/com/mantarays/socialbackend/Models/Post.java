@@ -23,12 +23,12 @@ public class Post
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long post_id;
+    private Long post_id;
 
     @NonNull
-    private long poster_id;
+    private Long poster_id;
 
-    private long original_poster_id;
+    private Long original_poster_id;
 
     @NonNull
     private String post_text;

@@ -25,8 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 @Slf4j
-public class PostController
-{
+public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
@@ -35,10 +34,11 @@ public class PostController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/create")
-    public ResponseEntity<?> createPost(@RequestHeader("Authorization") String tokenHeader, @RequestBody Map<String, String> myMap)
-    {
+    public ResponseEntity<?> createPost(@RequestHeader("Authorization") String tokenHeader,
+            @RequestBody Map<String, String> myMap) {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/createpost").toUriString());
+        URI uri = URI.create(
+                ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/createpost").toUriString());
         User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
         Post post = new Post(user.getId(), myMap.get("post_text"));
 
@@ -50,10 +50,8 @@ public class PostController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/get_posts_from_id")
-    public ResponseEntity<?> getPostsFromUserID(@RequestBody Map<String, String> myMap)
-    {
-        if(myMap != null && myMap.containsKey("user_id"))
-        {
+    public ResponseEntity<?> getPostsFromUserID(@RequestBody Map<String, String> myMap) {
+        if (myMap != null && myMap.containsKey("user_id")) {
             User user = userService.getUserFromID(myMap.get("user_id"));
             List<Post> posts = user.getPosts();
 
@@ -65,8 +63,7 @@ public class PostController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/get_posts_from_friends")
-    public ResponseEntity<?> getPostsFromFriends(@RequestHeader("Authorization") String tokenHeader)
-    {
+    public ResponseEntity<?> getPostsFromFriends(@RequestHeader("Authorization") String tokenHeader) {
         String token = tokenUtility.getTokenFromHeader(tokenHeader);
         User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
         List<User> friendsList = user.getFriends();
@@ -75,15 +72,11 @@ public class PostController
 
         List<Post> friendsListPosts = new ArrayList<>();
 
-        for(User friend : friendsList)
-        {
+        for (User friend : friendsList) {
             System.out.println("Grabbing all posts from: " + friend.getUsername());
-            for(Post post : friend.getPosts())
-            {
-                if(post.getPost_date().after(new Date(System.currentTimeMillis() - (7 * DAY_IN_MS))))
-                {
-                    if(friendsListPosts.size() < 15)
-                    {
+            for (Post post : friend.getPosts()) {
+                if (post.getPost_date().after(new Date(System.currentTimeMillis() - (7 * DAY_IN_MS)))) {
+                    if (friendsListPosts.size() < 15) {
                         friendsListPosts.add(post);
                     }
                 }
@@ -95,38 +88,32 @@ public class PostController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/get_posts")
-    public ResponseEntity<?> getPosts()
-    {
+    public ResponseEntity<?> getPosts() {
         List<Post> posts = postService.getAllPosts();
-        
+
         posts.sort(Comparator.comparing(Post::getPost_date).reversed());
         return ResponseEntity.ok().body(posts);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/like_post")
-    public ResponseEntity<?> likePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
-    {
-        if(myMap.containsKey("post_id"))
-        {
+    public ResponseEntity<?> likePost(@RequestHeader("Authorization") String tokenHeader,
+            @RequestBody Map<String, String> myMap) {
+        if (myMap.containsKey("post_id")) {
             String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
             User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
 
             Long post_id = Long.valueOf(myMap.get("post_id"));
             Post post = postService.getPost(post_id);
 
-            if(post != null)
-            {
+            if (post != null) {
                 Map<String, String> response = new HashMap<String, String>();
 
-                if(post.getUsersThatLiked().contains(user.getId()))
-                {
+                if (post.getUsersThatLiked().contains(user.getId())) {
                     post.getUsersThatLiked().remove(user.getId());
                     response.put("liked", "" + false);
                     postService.unlikePost(post);
-                }
-                else
-                {
+                } else {
                     post.getUsersThatLiked().add(user.getId());
                     response.put("liked", "" + true);
                     postService.likePost(post);
@@ -142,26 +129,21 @@ public class PostController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/dislike_post")
-    public ResponseEntity<?> dislikePost(@RequestHeader("Authorization") String tokenHeader,  @RequestBody Map<String, String> myMap)
-    {
-        if(myMap.containsKey("post_id"))
-        {
+    public ResponseEntity<?> dislikePost(@RequestHeader("Authorization") String tokenHeader,
+            @RequestBody Map<String, String> myMap) {
+        if (myMap.containsKey("post_id")) {
             String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
             User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken));
 
             Long post_id = Long.valueOf(myMap.get("post_id"));
             Post post = postService.getPost(post_id);
 
-            if(post != null)
-            {
-                if(post.getUsersThatDisliked().contains(user.getId()))
-                {
+            if (post != null) {
+                if (post.getUsersThatDisliked().contains(user.getId())) {
                     post.getUsersThatDisliked().remove(user.getId());
                     postService.undislikePost(post);
                     return ResponseEntity.ok().body("Removed dislike from post.");
-                }
-                else
-                {
+                } else {
                     post.getUsersThatDisliked().add(user.getId());
                     postService.dislikePost(post);
                     return ResponseEntity.ok().body("Added dislike to post.");
@@ -175,16 +157,16 @@ public class PostController
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/comment_on_post")
     public ResponseEntity<?> commentOnPost(@RequestHeader("Authorization") String tokenHeader,
-                                           @RequestBody Map<String, String> myMap)
-    {
+            @RequestBody Map<String, String> myMap) {
         try {
-            User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(tokenUtility.getTokenFromHeader(tokenHeader)));
+            User user = userService.getUserFromUsername(
+                    tokenUtility.getUsernameFromToken(tokenUtility.getTokenFromHeader(tokenHeader)));
             Post post = postService.getPost(Long.valueOf(myMap.get("post_id")));
             Comment newComment = new Comment(user.getId(), myMap.get("comment_text"));
-    
+
             commentService.createComment(newComment);
             postService.commentPost(post, newComment);
-    
+
             return ResponseEntity.ok().body(newComment);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Query Failed");
@@ -193,13 +175,12 @@ public class PostController
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/update_post_text")
-    public ResponseEntity<?> updatePostText(Post post, String text)
-    {
-        if(!postTextVerification.checkPostText(text))
-        {
+    public ResponseEntity<?> updatePostText(Post post, String text) {
+        if (!postTextVerification.checkPostText(text)) {
             return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body("Post text length failed preconditions.");
         }
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/updatePostText").toUriString());
+        URI uri = URI.create(
+                ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/posts/updatePostText").toUriString());
         postService.updatePostText(post, text);
         return ResponseEntity.created(uri).build();
     }
@@ -214,15 +195,22 @@ public class PostController
             Post post = postService.getPostById(myMap.get("post_id"));
             Map<String, String> response = new HashMap<String, String>();
 
-            /* if (comment.getCommenter_id() != user.getId()) 
-                return ResponseEntity.badRequest().body("Query failed"); */
-            
-            boolean succeed = postService.deletePost(post);
+            if (post.getPoster_id() != user.getId()) {
+                throw new Exception();
+            }
+            if (userService.deletePost(user, post) &&
+                    postService.deletePost(post)) {
+                response.put("failed", "false");
+            } else {
+                response.put("failed", "true");
+            }
 
-            response.put("deleted", "" + succeed);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Query Failed");
+            Map<String, String> response = new HashMap<String, String>();
+
+            response.put("failed", "true");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 }

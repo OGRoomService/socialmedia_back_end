@@ -2,11 +2,14 @@ package com.mantarays.socialbackend.ServiceInterfaces;
 
 import java.util.List;
 
+import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
 
 public interface UserServiceIntf
 {
+    boolean deletePost(User user, Post post);
+
     //User commands
     void createUser(User user);
     User getUser(String username);

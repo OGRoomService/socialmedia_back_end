@@ -28,14 +28,22 @@ public class CommentService implements CommentServiceIntf {
     }
 
     @Override
+    public boolean deleteComment(Comment comment) {
+        try {
+            commentRepository.delete(comment);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
     public boolean deleteCommentById(String id) {
         try {
-            System.out.println("Deleting comment");
             Long lId = Long.parseLong(id);
+
             commentRepository.deleteById(lId);
-            System.out.println("deleted comment");
-
-
             return true;
         } catch (Exception e) {
             return false;
