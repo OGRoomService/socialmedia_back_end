@@ -4,9 +4,13 @@ import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.User;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface PostServiceIntf
 {
     boolean deleteComment(Post post, Comment comment);
+    Page<Post> pagePosts(int page);
 
     Post createPost(Post post);
     Post getPost(Long post_id);

@@ -14,6 +14,7 @@ import com.mantarays.socialbackend.VerificationServices.PostTextVerification;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,7 +56,7 @@ public class PostController {
             User user = userService.getUserFromID(myMap.get("user_id"));
             List<Post> posts = user.getPosts();
 
-            posts.sort(Comparator.comparing(Post::getPost_date).reversed());
+            posts.sort(Comparator.comparing(Post::getPostDate).reversed());
             return ResponseEntity.ok().body(posts);
         }
         return ResponseEntity.badRequest().body("user_id was null");
@@ -75,25 +76,37 @@ public class PostController {
         for (User friend : friendsList) {
             System.out.println("Grabbing all posts from: " + friend.getUsername());
             for (Post post : friend.getPosts()) {
-                if (post.getPost_date().after(new Date(System.currentTimeMillis() - (7 * DAY_IN_MS)))) {
+                if (post.getPostDate().after(new Date(System.currentTimeMillis() - (7 * DAY_IN_MS)))) {
                     if (friendsListPosts.size() < 15) {
                         friendsListPosts.add(post);
                     }
                 }
             }
         }
-        friendsListPosts.sort(Comparator.comparing(Post::getPost_date).reversed());
+        friendsListPosts.sort(Comparator.comparing(Post::getPostDate.reversed());
         return ResponseEntity.ok().body(friendsListPosts);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/page_posts")
+    public Page<Post> pagePosts(@RequestParam("page") int page) {
+        try {
+            Page<Post> pagedPosts = postService.pagePosts(page);
+
+            return pagedPosts;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /* @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/get_posts")
     public ResponseEntity<?> getPosts() {
         List<Post> posts = postService.getAllPosts();
 
-        posts.sort(Comparator.comparing(Post::getPost_date).reversed());
+        posts.sort(Comparator.comparing(Post::getPostDate).reversed());
         return ResponseEntity.ok().body(posts);
-    }
+    } */
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/like_post")

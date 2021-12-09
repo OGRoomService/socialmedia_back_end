@@ -8,6 +8,10 @@ import com.mantarays.socialbackend.Models.User;
 import com.mantarays.socialbackend.Repositories.PostRepository;
 import com.mantarays.socialbackend.ServiceInterfaces.PostServiceIntf;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,7 @@ import java.util.List;
 @Slf4j
 public class PostService implements PostServiceIntf {
     private final PostRepository postRepo;
+    private final int pageSize = 5;
 
     @Override
     public boolean deleteComment(Post post, Comment comment) {
@@ -31,6 +36,20 @@ public class PostService implements PostServiceIntf {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public Page<Post> pagePosts(int page) {
+        Pageable pageable = createPageRequest(page);
+        Page<Post> pageRequest = postRepo.findAll(pageable);
+
+        return pageRequest;
+    }
+
+    private Pageable createPageRequest(int page) {
+            PageRequest request = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "postDate"));
+
+            return request;
     }
 
     @Override

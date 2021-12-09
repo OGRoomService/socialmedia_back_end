@@ -51,6 +51,6 @@ public class Post
 
     @NonNull
     @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private Date post_date = new Date();
+    @Column(name = "post_date", nullable = false, updatable = false)
+    private Date postDate = new Date();
 }
