@@ -5,7 +5,9 @@ import java.util.Map;
 
 import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
+import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
+import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Services.CommentService;
 import com.mantarays.socialbackend.Services.PostService;
 import com.mantarays.socialbackend.Services.UserService;
@@ -31,6 +33,7 @@ public class CommentController {
     private final UserService userService;
     private final CommentService commentService;
     private final PostService postService;
+    private final RoleRepository roleRepository;
     private final TokenUtility tokenUtility;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -68,9 +71,12 @@ public class CommentController {
             User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
             Comment comment = commentService.getCommentById(myMap.get("comment_id"));
             Post post = postService.getPostById(myMap.get("post_id"));
+            Role roleAdmin = roleRepository.findByName("ROLE_ADMIN");
             Map<String, String> response = new HashMap<String, String>();
+            boolean isAdmin = user.getRoles().contains(roleAdmin);
 
-            if (comment.getCommenter_id() != user.getId()) {
+            if (comment.getCommenter_id() != user.getId() &&
+                    !isAdmin) {
                 throw new Exception();
             }
             if (postService.deleteComment(post, comment) &&

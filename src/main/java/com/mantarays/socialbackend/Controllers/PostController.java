@@ -5,7 +5,9 @@ import java.util.*;
 
 import com.mantarays.socialbackend.Models.Comment;
 import com.mantarays.socialbackend.Models.Post;
+import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
+import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Services.CommentService;
 import com.mantarays.socialbackend.Services.PostService;
 import com.mantarays.socialbackend.Services.UserService;
@@ -30,6 +32,7 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
+    private final RoleRepository roleRepository;
     private final PostTextVerification postTextVerification;
     private final TokenUtility tokenUtility;
 
@@ -83,30 +86,45 @@ public class PostController {
                 }
             }
         }
-        friendsListPosts.sort(Comparator.comparing(Post::getPostDate.reversed());
+        // friendsListPosts.sort(Comparator.comparing(Post::getPostDate.reversed());
         return ResponseEntity.ok().body(friendsListPosts);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/page_posts")
-    public Page<Post> pagePosts(@RequestParam("page") int page) {
+    @GetMapping("/page_posts_by_id")
+    public ResponseEntity<?> pagePostsById(@RequestParam("page") int page, @RequestParam("userId") Long userId) {
         try {
-            Page<Post> pagedPosts = postService.pagePosts(page);
+            Page<Post> pagedPosts = postService.pagePostsById(userId, page);
 
-            return pagedPosts;
+            return ResponseEntity.ok().body(pagedPosts.getContent());
         } catch (Exception e) {
-            return null;
+            return ResponseEntity.badRequest().body("Query Failed");
         }
     }
 
-    /* @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("/get_posts")
-    public ResponseEntity<?> getPosts() {
-        List<Post> posts = postService.getAllPosts();
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/page_posts")
+    public ResponseEntity<?> pagePosts(@RequestParam("page") int page) {
+        try {
+            Page<Post> pagedPosts = postService.pagePosts(page);
 
-        posts.sort(Comparator.comparing(Post::getPostDate).reversed());
-        return ResponseEntity.ok().body(posts);
-    } */
+            return ResponseEntity.ok().body(pagedPosts.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Query Failed");
+        }
+    }
+
+    /*
+     * @CrossOrigin(origins = "*", allowedHeaders = "*")
+     * 
+     * @GetMapping("/get_posts")
+     * public ResponseEntity<?> getPosts() {
+     * List<Post> posts = postService.getAllPosts();
+     * 
+     * posts.sort(Comparator.comparing(Post::getPostDate).reversed());
+     * return ResponseEntity.ok().body(posts);
+     * }
+     */
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping("/like_post")
@@ -206,10 +224,16 @@ public class PostController {
             String token = tokenUtility.getTokenFromHeader(tokenHeader);
             User user = userService.getUserFromUsername(tokenUtility.getUsernameFromToken(token));
             Post post = postService.getPostById(myMap.get("post_id"));
+            Role roleAdmin = roleRepository.findByName("ROLE_ADMIN");
             Map<String, String> response = new HashMap<String, String>();
 
-            if (post.getPoster_id() != user.getId()) {
+            if (post.getPosterId() != user.getId() &&
+                    !user.getRoles().contains(roleAdmin)) {
                 throw new Exception();
+            }
+            if (post.getPosterId() != user.getId() &&
+                    user.getRoles().contains(roleAdmin)) {
+                user = userService.getUserFromID(post.getPosterId());
             }
             if (userService.deletePost(user, post) &&
                     postService.deletePost(post)) {

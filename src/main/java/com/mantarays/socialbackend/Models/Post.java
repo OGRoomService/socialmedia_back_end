@@ -26,7 +26,8 @@ public class Post
     private Long post_id;
 
     @NonNull
-    private Long poster_id;
+    @Column(name = "poster_id")
+    private Long posterId;
 
     private Long original_poster_id;
 

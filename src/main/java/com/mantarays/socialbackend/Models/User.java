@@ -51,7 +51,6 @@ public class User
     private List<Post> posts = new ArrayList<>();
 
     @NonNull
-    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles = new ArrayList<>();
 

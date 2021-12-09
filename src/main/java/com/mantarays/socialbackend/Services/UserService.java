@@ -27,8 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class UserService implements UserServiceIntf, UserDetailsService
-{
+public class UserService implements UserServiceIntf, UserDetailsService {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
@@ -45,21 +44,18 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public void createUser(User user)
-    {
+    public void createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepo.save(user);
     }
 
     @Override
-    public Role saveRole(Role role)
-    {
+    public Role saveRole(Role role) {
         return roleRepo.save(role);
     }
 
     @Override
-    public void addRoleToUser(String username, String roleName)
-    {
+    public void addRoleToUser(String username, String roleName) {
         User user = userRepo.findByUsername(username);
         Role role = roleRepo.findByName(roleName);
 
@@ -67,17 +63,15 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public User getUser(String username)
-    {
+    public User getUser(String username) {
         return userRepo.findByUsername(username);
     }
 
     @Override
-    public User getUserFromID(String id)
-    {
+    public User getUserFromID(String id) {
         try {
             Long userId = Long.parseLong(id);
-            
+
             return userRepo.findById(userId).get();
         } catch (Exception e) {
             return null;
@@ -85,121 +79,109 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public User getUserFromEmail(String email)
-    {
+    public User getUserFromID(Long id) {
+        try {
+            return userRepo.findById(id).get();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public User getUserFromEmail(String email) {
         return userRepo.findByEmail(email);
     }
 
     @Override
-    public User getUserFromUsername(String username)
-    {
+    public User getUserFromUsername(String username) {
         return userRepo.findByUsername(username);
     }
 
     @Override
-    public User getUserFromPasswordResetToken(String passwordResetToken)
-    {
+    public User getUserFromPasswordResetToken(String passwordResetToken) {
         return userRepo.findByPasswordResetToken(passwordResetToken);
     }
 
     @Override
-    public List<User> getUsers()
-    {
+    public List<User> getUsers() {
         return userRepo.findAll();
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
-    {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByUsername(username);
-        if(user == null)
-        {
+        if (user == null) {
             String error = "User not found in database.";
             log.error(error);
             throw new UsernameNotFoundException(error);
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+                authorities);
     }
 
-    public boolean doesEmailExist(String email)
-    {
-        try
-        {
+    public boolean doesEmailExist(String email) {
+        try {
             User user = getUserFromEmail(email);
             return user != null;
-        }
-        catch(UsernameNotFoundException e)
-        {
+        } catch (UsernameNotFoundException e) {
             return false;
         }
     }
 
-    public boolean doesUsernameExist(String username)
-    {
-        try
-        {
-            org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) loadUserByUsername(username);
+    public boolean doesUsernameExist(String username) {
+        try {
+            org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) loadUserByUsername(
+                    username);
             return true;
-        }
-        catch(UsernameNotFoundException e)
-        {
+        } catch (UsernameNotFoundException e) {
             return false;
         }
     }
 
     @Override
-    public void updateEmail(User user, String email)
-    {
+    public void updateEmail(User user, String email) {
         user.setEmail(email);
         userRepo.save(user);
     }
 
     @Override
-    public void updatePasswordResetToken(User user, String passwordResetToken)
-    {
+    public void updatePasswordResetToken(User user, String passwordResetToken) {
         user.setPasswordResetToken(passwordResetToken);
         userRepo.save(user);
     }
 
     @Override
-    public void updateProfilePicture(User user, String linkToProfilePicture)
-    {
+    public void updateProfilePicture(User user, String linkToProfilePicture) {
         user.setProfilePictureLink(linkToProfilePicture);
         userRepo.save(user);
     }
 
     @Override
-    public void updateLoggedIn(User user, boolean loggedIn)
-    {
+    public void updateLoggedIn(User user, boolean loggedIn) {
         user.setLogged_in(loggedIn);
         userRepo.save(user);
     }
 
     @Override
-    public void updateUsername(User user, String username)
-    {
+    public void updateUsername(User user, String username) {
         user.setUsername(username);
         userRepo.save(user);
     }
 
     @Override
-    public void updatePassword(User user, String password)
-    {
+    public void updatePassword(User user, String password) {
         user.setPassword(passwordEncoder.encode(password));
         userRepo.save(user);
     }
 
     @Override
-    public void addUserToFriendsList(User user, User newFriend)
-    {
-        if(user.getId() != newFriend.getId() && !(user.getFriends().contains(newFriend)))
-        {
+    public void addUserToFriendsList(User user, User newFriend) {
+        if (user.getId() != newFriend.getId() && !(user.getFriends().contains(newFriend))) {
             user.getPotentialFriends().add(newFriend);
 
-            if(newFriend.getPotentialFriends().contains(user))
-            {
+            if (newFriend.getPotentialFriends().contains(user)) {
                 newFriend.getPotentialFriends().remove(user);
                 user.getPotentialFriends().remove(newFriend);
                 newFriend.getFriends().add(user);
@@ -209,21 +191,18 @@ public class UserService implements UserServiceIntf, UserDetailsService
     }
 
     @Override
-    public void removeUserFromFriendsList(User user, User oldFriend)
-    {
+    public void removeUserFromFriendsList(User user, User oldFriend) {
         user.getFriends().remove(oldFriend);
         oldFriend.getFriends().remove(user);
     }
 
     @Override
-    public List<User> getPotentialFriendsThatContain(User user)
-    {
+    public List<User> getPotentialFriendsThatContain(User user) {
         return userRepo.findAllByPotentialFriendsContains(user);
     }
 
     @Override
-    public void removeFromPotentialFriends(User otherUser, User user)
-    {
+    public void removeFromPotentialFriends(User otherUser, User user) {
         otherUser.getPotentialFriends().remove(user);
         userRepo.save(user);
     }

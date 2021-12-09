@@ -11,6 +11,7 @@ public interface PostServiceIntf
 {
     boolean deleteComment(Post post, Comment comment);
     Page<Post> pagePosts(int page);
+    Page<Post> pagePostsById(Long userId, int page);
 
     Post createPost(Post post);
     Post getPost(Long post_id);

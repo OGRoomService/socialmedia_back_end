@@ -39,6 +39,14 @@ public class PostService implements PostServiceIntf {
     }
 
     @Override
+    public Page<Post> pagePostsById(Long userId, int page) {
+        Pageable pageable = createPageRequest(page);
+        Page<Post> pageRequest = postRepo.findAllByPosterId(userId, pageable);
+
+        return pageRequest;
+    }
+
+    @Override
     public Page<Post> pagePosts(int page) {
         Pageable pageable = createPageRequest(page);
         Page<Post> pageRequest = postRepo.findAll(pageable);
@@ -47,9 +55,9 @@ public class PostService implements PostServiceIntf {
     }
 
     private Pageable createPageRequest(int page) {
-            PageRequest request = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "postDate"));
+        PageRequest request = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "postDate"));
 
-            return request;
+        return request;
     }
 
     @Override
