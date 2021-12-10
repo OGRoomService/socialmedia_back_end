@@ -57,11 +57,11 @@ public class UserController {
     @Autowired
     private EmailUtility emailUtility;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    /* @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
-    }
+    } */
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users/get_self")
@@ -69,6 +69,26 @@ public class UserController {
         String accessToken = tokenUtility.getTokenFromHeader(tokenHeader);
         return ResponseEntity.ok()
                 .body(userService.getUserFromUsername(tokenUtility.getUsernameFromToken(accessToken)));
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/users/get_by_name")
+    public ResponseEntity<?> getUserByName(@RequestParam("username") String username) {
+        try {
+            User user = userService.getUserFromUsername(username);
+            Map<String, String> userData = new HashMap<String, String>();
+
+            userData.put("id", "" + user.getId());
+            userData.put("username", "" + user.getUsername());
+
+            return ResponseEntity.ok().body(userData);
+        } catch (Exception e) {
+            Map<String, String> response = new HashMap<String, String>();
+
+            response.put("failed", "true");
+
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
