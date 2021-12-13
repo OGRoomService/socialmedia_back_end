@@ -13,6 +13,7 @@ import com.mantarays.socialbackend.Forms.StandardReturnForm;
 import com.mantarays.socialbackend.Forms.UserFailureStringsForm;
 import com.mantarays.socialbackend.Forms.UserLoginForm;
 import com.mantarays.socialbackend.Models.User;
+import com.mantarays.socialbackend.Projections.ProjectIdAndUsername;
 import com.mantarays.socialbackend.Services.UserService;
 import com.mantarays.socialbackend.Utilities.EmailUtility;
 import com.mantarays.socialbackend.Utilities.PictureUploadingUtility;
@@ -21,6 +22,7 @@ import com.mantarays.socialbackend.VerificationServices.*;
 
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +64,18 @@ public class UserController {
     public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     } */
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @GetMapping("/users/query_users_by")
+    public ResponseEntity<?> pagePostsById(@RequestParam("page") int page, @RequestParam("username") String username, @RequestParam("count") int count) {
+        try {
+            Page<ProjectIdAndUsername> pagedUsers = userService.pageUserContainingName(username, page, count);
+
+            return ResponseEntity.ok().body(pagedUsers);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Query Failed");
+        }
+    }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/users/get_self")

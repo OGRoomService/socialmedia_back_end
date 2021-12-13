@@ -5,10 +5,14 @@ import java.util.List;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
+import com.mantarays.socialbackend.Projections.ProjectIdAndUsername;
+
+import org.springframework.data.domain.Page;
 
 public interface UserServiceIntf
 {
     boolean deletePost(User user, Post post);
+    Page<ProjectIdAndUsername> pageUserContainingName(String name, int page, int count);
 
     //User commands
     void createUser(User user);

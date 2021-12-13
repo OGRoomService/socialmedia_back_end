@@ -9,10 +9,15 @@ import javax.transaction.Transactional;
 import com.mantarays.socialbackend.Models.Post;
 import com.mantarays.socialbackend.Models.Role;
 import com.mantarays.socialbackend.Models.User;
+import com.mantarays.socialbackend.Projections.ProjectIdAndUsername;
 import com.mantarays.socialbackend.Repositories.RoleRepository;
 import com.mantarays.socialbackend.Repositories.UserRepository;
 import com.mantarays.socialbackend.ServiceInterfaces.UserServiceIntf;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,6 +36,23 @@ public class UserService implements UserServiceIntf, UserDetailsService {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public Page<ProjectIdAndUsername> pageUserContainingName(String name, int page, int count) {
+        if (count > 10) {
+            count = 10;
+        }
+        Pageable pageable = createPageRequest(page, count);
+        Page<ProjectIdAndUsername> pageRequest = userRepo.findAllByUsernameContaining(name, pageable);
+
+        return pageRequest;
+    }
+
+    private Pageable createPageRequest(int page, int count) {
+        PageRequest request = PageRequest.of(page, count);
+
+        return request;
+    }
 
     @Override
     public boolean deletePost(User user, Post post) {
